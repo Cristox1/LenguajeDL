@@ -109,3 +109,15 @@ mostrar(np_mul(A, np_ones([2, 3])));
 mostrar("zeros([2,2]):");
 mostrar(np_zeros([2, 2]));
 mostrar(" ");
+
+mostrar("=== ALGORITMO 5: MINI-NUMPY RNG ===");
+np_seed(123);
+a = np_rand([2, 3]);
+np_seed(123);
+b = np_rand([2, 3]);
+mostrar("a:");
+mostrar(a);
+mostrar("b:");
+mostrar(b);
+mostrar("Uniforme [-1,1) shape [3]:");
+mostrar(np_uniform(-1, 1, [3]));

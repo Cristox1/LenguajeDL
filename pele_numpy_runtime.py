@@ -6,6 +6,31 @@ def _is_number(x):
     return (isinstance(x, int) or isinstance(x, float)) and not isinstance(x, bool)
 
 
+_RNG_M = 4294967296
+_RNG_A = 1664525
+_RNG_C = 1013904223
+_rng_state = 1
+
+
+def _coerce_seed(seed):
+    if isinstance(seed, bool):
+        return 1 if seed else 0
+    if isinstance(seed, int):
+        return seed
+    if isinstance(seed, float):
+        # En IEEE 754, NaN es el único valor que no es igual a sí mismo.
+        if seed != seed:
+            raise Exception("np_seed: seed no puede ser NaN")
+        return int(seed)
+    raise Exception("np_seed: seed debe ser int, float o bool")
+
+
+def _rng_next_unit():
+    global _rng_state
+    _rng_state = (_RNG_A * _rng_state + _RNG_C) % _RNG_M
+    return _rng_state / _RNG_M
+
+
 def _product(vals):
     p = 1
     for v in vals:
@@ -134,6 +159,36 @@ def np_ones(shape_list):
     shape = _shape_from_input(shape_list)
     size = _product(shape) if len(shape) > 0 else 1
     return _make_tensor(shape, [1 for _ in range(size)])
+
+
+def np_seed(seed):
+    global _rng_state
+    seed_int = _coerce_seed(seed)
+    _rng_state = seed_int % _RNG_M
+    return None
+
+
+def np_rand(shape):
+    shape_list = _shape_from_input(shape)
+    size = _product(shape_list) if len(shape_list) > 0 else 1
+    out = []
+    for _ in range(size):
+        out.append(_rng_next_unit())
+    return _make_tensor(shape_list, out)
+
+
+def np_uniform(low, high, shape):
+    if not _is_number(low) or not _is_number(high):
+        raise Exception("np_uniform: low y high deben ser escalares numéricos")
+    if high <= low:
+        raise Exception("np_uniform: high debe ser mayor que low")
+    shape_list = _shape_from_input(shape)
+    size = _product(shape_list) if len(shape_list) > 0 else 1
+    span = high - low
+    out = []
+    for _ in range(size):
+        out.append(low + _rng_next_unit() * span)
+    return _make_tensor(shape_list, out)
 
 
 def _elementwise_binary(a, b, op_name):

@@ -1,5 +1,6 @@
 from PELEVisitor import PELEVisitor
 from PELEParser import PELEParser
+import pele_numpy_runtime as pnp
 
 class ReturnValue(Exception):
     """Excepción interna usada para implementar 'retornar' en funciones."""
@@ -275,6 +276,20 @@ class EvalVisitor(PELEVisitor):
             # Helpers para arreglos (opcional)
             "arr_get": self._arr_get,
             "arr_set": self._arr_set,
+            # Mini-Numpy
+            "np_array": pnp.np_array,
+            "np_shape": pnp.np_shape,
+            "np_zeros": pnp.np_zeros,
+            "np_ones": pnp.np_ones,
+            "np_add": pnp.np_add,
+            "np_sub": pnp.np_sub,
+            "np_mul": pnp.np_mul,
+            "np_div": pnp.np_div,
+            "np_scalar_mul": pnp.np_scalar_mul,
+            "np_transpose": pnp.np_transpose,
+            "np_matmul": pnp.np_matmul,
+            "np_sum": pnp.np_sum,
+            "np_argmax": pnp.np_argmax,
         }
 
     # Implementaciones de builtins (idénticas a las previas)

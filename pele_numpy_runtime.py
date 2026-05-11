@@ -165,7 +165,7 @@ def _elementwise_binary(a, b, op_name):
         return _make_tensor(ta["shape"], [apply_op(v, s) for v in ta["data"]])
 
     if ta["shape"] != tb["shape"]:
-        raise Exception("operación elemento a elemento requiere shapes iguales o escalar")
+        raise Exception("operación elemento a elemento requiere shapes iguales")
     return _make_tensor(ta["shape"], [apply_op(x, y) for x, y in zip(ta["data"], tb["data"])])
 
 
@@ -209,6 +209,9 @@ def np_matmul(a, b):
     tb = np_array(b)
     na = ta["ndim"]
     nb = tb["ndim"]
+
+    if na == 0 or nb == 0:
+        raise Exception("np_matmul: no soporta tensores escalares (0D)")
 
     if na not in [1, 2] or nb not in [1, 2]:
         raise Exception("np_matmul: solo soporta combinaciones 1D/2D")
@@ -323,6 +326,9 @@ def np_argmax(a, axis):
     ax = int(axis)
     if ax != axis:
         raise Exception("np_argmax: axis debe ser entero")
+
+    if t["ndim"] == 0:
+        raise Exception("np_argmax: no está definido para tensores escalares (0D)")
 
     if t["ndim"] == 1:
         if ax not in [-1, 0]:

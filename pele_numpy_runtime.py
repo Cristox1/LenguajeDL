@@ -18,6 +18,7 @@ def _coerce_seed(seed):
     if isinstance(seed, int):
         return seed
     if isinstance(seed, float):
+        # En IEEE 754, NaN es el único valor que no es igual a sí mismo.
         if seed != seed:
             raise Exception("np_seed: seed no puede ser NaN")
         return int(seed)
@@ -164,7 +165,7 @@ def np_seed(seed):
     global _rng_state
     seed_int = _coerce_seed(seed)
     _rng_state = seed_int % _RNG_M
-    return _rng_state
+    return None
 
 
 def np_rand(shape):

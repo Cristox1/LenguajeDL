@@ -1,1 +1,0 @@
-from .psodoz import run

@@ -1,0 +1,306 @@
+// pele_pandas.pele - Libreria de Manipulacion de Datos (Pandas)
+// Implementada 100% en PELE bajo el Paradigma Funcional
+
+// ============================================================
+// AUXILIARES DE COPIA Y STRINGS
+// ============================================================
+
+funcion pd_split_linea(linea, sep) {
+    res = [];
+    actual = "";
+    n = longitud(linea);
+    por (i = 0; i < n; i = i + 1) {
+        c = linea[i];
+        // Ignorar retornos de carro de Windows (\r)
+        si (c != "\r") {
+            si (c == sep) {
+                res = append(res, actual);
+                actual = "";
+            } sino {
+                actual = actual + c;
+            }
+        }
+    }
+    res = append(res, actual);
+    retornar res;
+}
+
+funcion pd_split_texto(texto, sep) {
+    res = [];
+    actual = "";
+    n = longitud(texto);
+    por (i = 0; i < n; i = i + 1) {
+        c = texto[i];
+        si (c == sep) {
+            res = append(res, actual);
+            actual = "";
+        } sino {
+            actual = actual + c;
+        }
+    }
+    si (longitud(actual) > 0) {
+        res = append(res, actual);
+    }
+    retornar res;
+}
+
+// Intenta convertir un string a numero si es posible
+funcion pd_parse_val(val) {
+    si (longitud(val) == 0) { retornar ""; }
+    // Intentar convertir a entero o decimal
+    // Validar si solo contiene digitos, punto o signo menos
+    es_num = true;
+    puntos = 0;
+    por (i = 0; i < longitud(val); i = i + 1) {
+        c = val[i];
+        si (c == ".") { puntos = puntos + 1; }
+        sino si (c == "-") {
+            si (i != 0) { es_num = false; }
+        }
+        sino si (c < "0" || c > "9") {
+            es_num = false;
+        }
+    }
+    si (es_num && puntos <= 1) {
+        si (puntos == 1) { retornar decimal(val); }
+        retornar entero(val);
+    }
+    retornar val;
+}
+
+// ============================================================
+// CARGA DE DATOS (READ CSV)
+// ============================================================
+
+funcion pd_read_csv(contenido) {
+    lineas = pd_split_texto(contenido, "\n");
+    si (longitud(lineas) == 0) {
+        error("pd_read_csv: El contenido CSV esta vacio");
+    }
+    
+    // Cabecera (primera linea)
+    cabecera = pd_split_linea(lineas[0], ",");
+    
+    data = [];
+    n_lineas = longitud(lineas);
+    por (i = 1; i < n_lineas; i = i + 1) {
+        linea = lineas[i];
+        si (longitud(linea) > 0) {
+            valores_str = pd_split_linea(linea, ",");
+            fila = [];
+            por (j = 0; j < longitud(valores_str); j = j + 1) {
+                fila = append(fila, pd_parse_val(valores_str[j]));
+            }
+            // Validar consistencia de columnas
+            si (longitud(fila) == longitud(cabecera)) {
+                data = append(data, fila);
+            }
+        }
+    }
+    
+    retornar {columnas: cabecera, data: data};
+}
+
+// ============================================================
+// SELECCIÓN Y EXTRACCIÓN DE COLUMNAS
+// ============================================================
+
+funcion pd_get_column_idx(columnas, nombre) {
+    por (i = 0; i < longitud(columnas); i = i + 1) {
+        si (columnas[i] == nombre) { retornar i; }
+    }
+    retornar -1;
+}
+
+funcion pd_get_column(df, nombre) {
+    cols = df["columnas"];
+    idx = pd_get_column_idx(cols, nombre);
+    si (idx == -1) {
+        error("pd_get_column: Columna '" + nombre + "' no encontrada");
+    }
+    
+    res = [];
+    data = df["data"];
+    n = longitud(data);
+    por (i = 0; i < n; i = i + 1) {
+        res = append(res, data[i][idx]);
+    }
+    retornar res;
+}
+
+funcion pd_select_columns(df, lista_nombres) {
+    cols_orig = df["columnas"];
+    data_orig = df["data"];
+    
+    // Obtener indices de las columnas seleccionadas
+    indices = [];
+    por (i = 0; i < longitud(lista_nombres); i = i + 1) {
+        idx = pd_get_column_idx(cols_orig, lista_nombres[i]);
+        si (idx == -1) {
+            error("pd_select_columns: Columna '" + lista_nombres[i] + "' no encontrada");
+        }
+        indices = append(indices, idx);
+    }
+    
+    nueva_data = [];
+    n_filas = longitud(data_orig);
+    por (i = 0; i < n_filas; i = i + 1) {
+        fila_orig = data_orig[i];
+        nueva_fila = [];
+        por (j = 0; j < longitud(indices); j = j + 1) {
+            nueva_fila = append(nueva_fila, fila_orig[indices[j]]);
+        }
+        nueva_data = append(nueva_data, nueva_fila);
+    }
+    
+    retornar {columnas: lista_nombres, data: nueva_data};
+}
+
+// ============================================================
+// UTILIDADES (HEAD, DROP, FILLNA, TO_NUMPY)
+// ============================================================
+
+funcion pd_head(df, n) {
+    data = df["data"];
+    cant = min(n, longitud(data));
+    nueva_data = [];
+    por (i = 0; i < cant; i = i + 1) {
+        nueva_data = append(nueva_data, data[i]);
+    }
+    retornar {columnas: df["columnas"], data: nueva_data};
+}
+
+funcion pd_drop_column(df, nombre) {
+    cols = df["columnas"];
+    idx = pd_get_column_idx(cols, nombre);
+    si (idx == -1) { retornar df; } // Si no existe, no hace nada
+    
+    nuevas_cols = [];
+    por (i = 0; i < longitud(cols); i = i + 1) {
+        si (i != idx) { nuevas_cols = append(nuevas_cols, cols[i]); }
+    }
+    
+    nueva_data = [];
+    data = df["data"];
+    n_filas = longitud(data);
+    por (i = 0; i < n_filas; i = i + 1) {
+        fila = data[i];
+        nueva_fila = [];
+        por (j = 0; j < longitud(fila); j = j + 1) {
+            si (j != idx) { nueva_fila = append(nueva_fila, fila[j]); }
+        }
+        nueva_data = append(nueva_data, nueva_fila);
+    }
+    
+    retornar {columnas: nuevas_cols, data: nueva_data};
+}
+
+funcion pd_fill_na(df, nombre_col, valor_relleno) {
+    cols = df["columnas"];
+    idx = pd_get_column_idx(cols, nombre_col);
+    si (idx == -1) { retornar df; }
+    
+    data = df["data"];
+    nueva_data = [];
+    n_filas = longitud(data);
+    por (i = 0; i < n_filas; i = i + 1) {
+        fila = data[i];
+        nueva_fila = [];
+        por (j = 0; j < longitud(fila); j = j + 1) {
+            val = fila[j];
+            si (j == idx && (val == "" || val == "NA" || val == "NaN")) {
+                nueva_fila = append(nueva_fila, valor_relleno);
+            } sino {
+                nueva_fila = append(nueva_fila, val);
+            }
+        }
+        nueva_data = append(nueva_data, nueva_fila);
+    }
+    retornar {columnas: cols, data: nueva_data};
+}
+
+funcion pd_to_numpy(df) {
+    retornar df["data"];
+}
+
+funcion pd_info(df) {
+    mostrar("--- PELE DataFrame Info ---");
+    mostrar("Columnas:");
+    mostrar(df["columnas"]);
+    mostrar("Cantidad de Filas:");
+    mostrar(longitud(df["data"]));
+    mostrar("---------------------------");
+    retornar 0;
+}
+
+// ============================================================
+// ONE-HOT ENCODING (CRUCIAL PARA DEEP LEARNING)
+// ============================================================
+
+funcion pd_one_hot_encode(df, nombre_col) {
+    cols = df["columnas"];
+    idx = pd_get_column_idx(cols, nombre_col);
+    si (idx == -1) {
+        error("pd_one_hot_encode: Columna '" + nombre_col + "' no encontrada");
+    }
+    
+    // 1. Obtener valores unicos de la columna (categorias)
+    col_data = pd_get_column(df, nombre_col);
+    categorias = [];
+    por (i = 0; i < longitud(col_data); i = i + 1) {
+        val = col_data[i];
+        // Comprobar si ya existe en categorias
+        existe = false;
+        por (j = 0; j < longitud(categorias); j = j + 1) {
+            si (categorias[j] == val) { existe = true; }
+        }
+        si (no existe) {
+            categorias = append(categorias, val);
+        }
+    }
+    
+    // 2. Construir nuevas columnas
+    nuevas_cols = [];
+    // Mantener columnas previas a la codificada
+    por (i = 0; i < idx; i = i + 1) {
+        nuevas_cols = append(nuevas_cols, cols[i]);
+    }
+    // Agregar las columnas one-hot con el formato "col_categoria"
+    por (i = 0; i < longitud(categorias); i = i + 1) {
+        nuevas_cols = append(nuevas_cols, nombre_col + "_" + a_texto(categorias[i]));
+    }
+    // Agregar columnas posteriores
+    por (i = idx + 1; i < longitud(cols); i = i + 1) {
+        nuevas_cols = append(nuevas_cols, cols[i]);
+    }
+    
+    // 3. Reconstruir datos de filas
+    data = df["data"];
+    nueva_data = [];
+    n_filas = longitud(data);
+    por (i = 0; i < n_filas; i = i + 1) {
+        fila = data[i];
+        val_cat = fila[idx];
+        nueva_fila = [];
+        
+        // Copiar anteriores
+        por (j = 0; j < idx; j = j + 1) {
+            nueva_fila = append(nueva_fila, fila[j]);
+        }
+        // Colocar 1 o 0 segun corresponda a cada categoria
+        por (j = 0; j < longitud(categorias); j = j + 1) {
+            si (categorias[j] == val_cat) {
+                nueva_fila = append(nueva_fila, 1);
+            } sino {
+                nueva_fila = append(nueva_fila, 0);
+            }
+        }
+        // Copiar posteriores
+        por (j = idx + 1; j < longitud(fila); j = j + 1) {
+            nueva_fila = append(nueva_fila, fila[j]);
+        }
+        nueva_data = append(nueva_data, nueva_fila);
+    }
+    
+    retornar {columnas: nuevas_cols, data: nueva_data};
+}

@@ -78,19 +78,19 @@ assignment
     : ID '=' expr
     ;
 
-// Expresiones — de menor a mayor precedencia
+// Expresiones — de mayor a menor precedencia (ANTLR4 evalúa de arriba a abajo)
 expr
-    : expr PIPE expr                               # PipeExpr
-    | expr OR expr                                 # OrExpr
-    | expr AND expr                                # AndExpr
-    | NOT expr                                     # NotExpr
-    | expr (EQEQ | NEQ) expr                       # EqExpr
-    | expr (LT | LE | GT | GE) expr                # RelationalExpr
-    | expr ('+' | '-') expr                        # AddSubExpr
-    | expr ('*' | '/' | '%') expr                  # MulDivModExpr
-    | expr POW expr                                # PowerExpr
+    : postfix                                      # PostfixExpr
     | '-' expr                                     # UnaryMinusExpr
-    | postfix                                      # PostfixExpr
+    | NOT expr                                     # NotExpr
+    | expr POW expr                                # PowerExpr
+    | expr ('*' | '/' | '%') expr                  # MulDivModExpr
+    | expr ('+' | '-') expr                        # AddSubExpr
+    | expr (LT | LE | GT | GE) expr                # RelationalExpr
+    | expr (EQEQ | NEQ) expr                       # EqExpr
+    | expr AND expr                                # AndExpr
+    | expr OR expr                                 # OrExpr
+    | expr PIPE expr                               # PipeExpr
     ;
 
 // Postfix — acceso por índice y llamadas a métodos

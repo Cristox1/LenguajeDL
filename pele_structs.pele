@@ -1,0 +1,287 @@
+// pele_structs.pele — Estructuras de Datos
+// Implementada 100% en PELE bajo el Paradigma Funcional
+// Pilas, Colas, Conjuntos, Arboles, Grafos, Mapas
+
+// ============================================================
+// MAPAS (ahora con dict literal {} nativo, estas son helpers)
+// ============================================================
+
+funcion mapa_contiene(m, clave) {
+    claves = mapa_keys(m);
+    por (i = 0; i < longitud(claves); i = i + 1) {
+        si (arr_get(claves, i) == clave) { retornar true; }
+    }
+    retornar false;
+}
+
+// ============================================================
+// PILAS (implementadas sobre listas nativas)
+// ============================================================
+
+funcion pila_crear() {
+    retornar [];
+}
+
+funcion pila_apilar(pila, valor) {
+    retornar append(pila, valor);
+}
+
+funcion pila_desapilar(pila) {
+    si (longitud(pila) == 0) { error("pila_desapilar: pila vacia"); }
+    n = longitud(pila);
+    valor = pila[n - 1];
+    nueva_pila = [];
+    por (i = 0; i < n - 1; i = i + 1) {
+        nueva_pila = append(nueva_pila, pila[i]);
+    }
+    retornar [valor, nueva_pila];
+}
+
+funcion pila_tope(pila) {
+    si (longitud(pila) == 0) { error("pila_tope: pila vacia"); }
+    retornar pila[longitud(pila) - 1];
+}
+
+funcion pila_vacia(pila) {
+    retornar longitud(pila) == 0;
+}
+
+// ============================================================
+// COLAS (implementadas sobre listas nativas)
+// ============================================================
+
+funcion cola_crear() {
+    retornar [];
+}
+
+funcion cola_agregar(cola, valor) {
+    retornar append(cola, valor);
+}
+
+funcion cola_remover(cola) {
+    si (longitud(cola) == 0) { error("cola_remover: cola vacia"); }
+    valor = cola[0];
+    nueva_cola = tail(cola);
+    retornar [valor, nueva_cola];
+}
+
+funcion cola_frente(cola) {
+    si (longitud(cola) == 0) { error("cola_frente: cola vacia"); }
+    retornar cola[0];
+}
+
+funcion cola_vacia(cola) {
+    retornar longitud(cola) == 0;
+}
+
+// ============================================================
+// CONJUNTOS (implementados sobre listas sin duplicados)
+// ============================================================
+
+funcion conjunto_crear() {
+    retornar [];
+}
+
+funcion conjunto_desde(arr) {
+    c = [];
+    por (i = 0; i < longitud(arr); i = i + 1) {
+        si (no conjunto_tiene(c, arr[i])) {
+            c = append(c, arr[i]);
+        }
+    }
+    retornar c;
+}
+
+funcion conjunto_agregar(c, valor) {
+    si (conjunto_tiene(c, valor)) { retornar c; }
+    retornar append(c, valor);
+}
+
+funcion conjunto_tiene(c, valor) {
+    por (i = 0; i < longitud(c); i = i + 1) {
+        si (c[i] == valor) { retornar true; }
+    }
+    retornar false;
+}
+
+funcion conjunto_union(a, b) {
+    resultado = a;
+    por (i = 0; i < longitud(b); i = i + 1) {
+        resultado = conjunto_agregar(resultado, b[i]);
+    }
+    retornar resultado;
+}
+
+funcion conjunto_interseccion(a, b) {
+    resultado = [];
+    por (i = 0; i < longitud(a); i = i + 1) {
+        si (conjunto_tiene(b, a[i])) {
+            resultado = append(resultado, a[i]);
+        }
+    }
+    retornar resultado;
+}
+
+funcion conjunto_tamano(c) {
+    retornar longitud(c);
+}
+
+// ============================================================
+// MATRICES (helpers sobre listas de listas)
+// ============================================================
+
+funcion matriz_crear(filas, cols, valor) {
+    m = [];
+    por (i = 0; i < filas; i = i + 1) {
+        fila = [];
+        por (j = 0; j < cols; j = j + 1) {
+            fila = append(fila, valor);
+        }
+        m = append(m, fila);
+    }
+    retornar m;
+}
+
+funcion matriz_get(m, i, j) {
+    retornar m[i][j];
+}
+
+funcion matriz_set(m, i, j, val) {
+    arr_set(arr_get(m, i), j, val);
+    retornar m;
+}
+
+funcion matriz_filas(m) {
+    retornar longitud(m);
+}
+
+funcion matriz_cols(m) {
+    si (longitud(m) == 0) { retornar 0; }
+    retornar longitud(m[0]);
+}
+
+// ============================================================
+// ARBOLES (nodo como diccionario)
+// ============================================================
+
+funcion arbol_crear(valor) {
+    retornar {valor: valor, hijos: []};
+}
+
+funcion arbol_agregar_hijo(nodo, hijo) {
+    hijos_actuales = nodo["hijos"];
+    nuevos_hijos = append(hijos_actuales, hijo);
+    retornar {valor: nodo["valor"], hijos: nuevos_hijos};
+}
+
+funcion arbol_valor(nodo) {
+    retornar nodo["valor"];
+}
+
+funcion arbol_hijos(nodo) {
+    retornar nodo["hijos"];
+}
+
+funcion arbol_preorden(nodo) {
+    resultado = [nodo["valor"]];
+    hijos = nodo["hijos"];
+    por (i = 0; i < longitud(hijos); i = i + 1) {
+        sub = arbol_preorden(hijos[i]);
+        por (j = 0; j < longitud(sub); j = j + 1) {
+            resultado = append(resultado, sub[j]);
+        }
+    }
+    retornar resultado;
+}
+
+funcion arbol_inorden(nodo) {
+    hijos = nodo["hijos"];
+    si (longitud(hijos) == 0) { retornar [nodo["valor"]]; }
+    resultado = [];
+    si (longitud(hijos) >= 1) {
+        sub_izq = arbol_inorden(hijos[0]);
+        por (i = 0; i < longitud(sub_izq); i = i + 1) {
+            resultado = append(resultado, sub_izq[i]);
+        }
+    }
+    resultado = append(resultado, nodo["valor"]);
+    por (h = 1; h < longitud(hijos); h = h + 1) {
+        sub = arbol_inorden(hijos[h]);
+        por (i = 0; i < longitud(sub); i = i + 1) {
+            resultado = append(resultado, sub[i]);
+        }
+    }
+    retornar resultado;
+}
+
+// ============================================================
+// GRAFOS (lista de adyacencia con diccionario)
+// ============================================================
+
+funcion grafo_crear() {
+    retornar {};
+}
+
+funcion grafo_agregar_nodo(g, nodo) {
+    si (no mapa_contiene(g, a_texto(nodo))) {
+        mapa_put(g, a_texto(nodo), []);
+    }
+    retornar g;
+}
+
+funcion grafo_agregar_arista(g, u, v) {
+    g = grafo_agregar_nodo(g, u);
+    g = grafo_agregar_nodo(g, v);
+    vecinos = mapa_get(g, a_texto(u));
+    mapa_put(g, a_texto(u), append(vecinos, v));
+    retornar g;
+}
+
+funcion grafo_vecinos(g, nodo) {
+    si (no mapa_contiene(g, a_texto(nodo))) { retornar []; }
+    retornar mapa_get(g, a_texto(nodo));
+}
+
+funcion grafo_bfs_nativo(g, inicio) {
+    visitados = conjunto_crear();
+    cola = [inicio];
+    orden = [];
+    visitados = conjunto_agregar(visitados, inicio);
+    mientras (longitud(cola) > 0) {
+        res = cola_remover(cola);
+        actual = res[0];
+        cola = res[1];
+        orden = append(orden, actual);
+        vecinos = grafo_vecinos(g, actual);
+        por (i = 0; i < longitud(vecinos); i = i + 1) {
+            v = vecinos[i];
+            si (no conjunto_tiene(visitados, v)) {
+                visitados = conjunto_agregar(visitados, v);
+                cola = append(cola, v);
+            }
+        }
+    }
+    retornar orden;
+}
+
+funcion grafo_dfs(g, inicio) {
+    visitados = conjunto_crear();
+    pila = [inicio];
+    orden = [];
+    mientras (longitud(pila) > 0) {
+        res = pila_desapilar(pila);
+        actual = res[0];
+        pila = res[1];
+        si (no conjunto_tiene(visitados, actual)) {
+            visitados = conjunto_agregar(visitados, actual);
+            orden = append(orden, actual);
+            vecinos = grafo_vecinos(g, actual);
+            por (i = longitud(vecinos) - 1; i >= 0; i = i - 1) {
+                si (no conjunto_tiene(visitados, vecinos[i])) {
+                    pila = append(pila, vecinos[i]);
+                }
+            }
+        }
+    }
+    retornar orden;
+}

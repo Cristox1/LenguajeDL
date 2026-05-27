@@ -27,17 +27,17 @@ def serializedATN():
         1,9,1,9,1,9,1,9,5,9,207,8,9,10,9,12,9,210,9,9,3,9,212,8,9,1,9,1,
         9,1,9,1,9,1,9,1,9,1,9,5,9,221,8,9,10,9,12,9,224,9,9,1,9,1,9,1,9,
         1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,3,9,238,8,9,1,10,1,10,1,10,1,
-        10,1,10,0,2,14,16,11,0,2,4,6,8,10,12,14,16,18,20,0,5,1,0,33,34,1,
-        0,35,38,1,0,8,9,1,0,10,12,2,0,17,17,42,42,275,0,22,1,0,0,0,2,28,
-        1,0,0,0,4,79,1,0,0,0,6,81,1,0,0,0,8,97,1,0,0,0,10,108,1,0,0,0,12,
-        116,1,0,0,0,14,126,1,0,0,0,16,157,1,0,0,0,18,237,1,0,0,0,20,239,
-        1,0,0,0,22,23,3,2,1,0,23,24,5,0,0,1,24,1,1,0,0,0,25,27,3,4,2,0,26,
-        25,1,0,0,0,27,30,1,0,0,0,28,26,1,0,0,0,28,29,1,0,0,0,29,3,1,0,0,
-        0,30,28,1,0,0,0,31,32,3,12,6,0,32,33,5,1,0,0,33,80,1,0,0,0,34,35,
-        3,14,7,0,35,36,5,1,0,0,36,80,1,0,0,0,37,38,5,20,0,0,38,39,5,2,0,
-        0,39,40,3,14,7,0,40,41,5,3,0,0,41,42,5,1,0,0,42,80,1,0,0,0,43,80,
-        3,6,3,0,44,45,5,21,0,0,45,46,5,2,0,0,46,47,3,14,7,0,47,48,5,3,0,
-        0,48,49,5,4,0,0,49,50,3,2,1,0,50,51,5,5,0,0,51,80,1,0,0,0,52,53,
+        10,1,10,0,2,14,16,11,0,2,4,6,8,10,12,14,16,18,20,0,5,1,0,9,11,2,
+        0,8,8,12,12,1,0,35,38,1,0,33,34,2,0,17,17,42,42,275,0,22,1,0,0,0,
+        2,28,1,0,0,0,4,79,1,0,0,0,6,81,1,0,0,0,8,97,1,0,0,0,10,108,1,0,0,
+        0,12,116,1,0,0,0,14,126,1,0,0,0,16,157,1,0,0,0,18,237,1,0,0,0,20,
+        239,1,0,0,0,22,23,3,2,1,0,23,24,5,0,0,1,24,1,1,0,0,0,25,27,3,4,2,
+        0,26,25,1,0,0,0,27,30,1,0,0,0,28,26,1,0,0,0,28,29,1,0,0,0,29,3,1,
+        0,0,0,30,28,1,0,0,0,31,32,3,12,6,0,32,33,5,1,0,0,33,80,1,0,0,0,34,
+        35,3,14,7,0,35,36,5,1,0,0,36,80,1,0,0,0,37,38,5,20,0,0,38,39,5,2,
+        0,0,39,40,3,14,7,0,40,41,5,3,0,0,41,42,5,1,0,0,42,80,1,0,0,0,43,
+        80,3,6,3,0,44,45,5,21,0,0,45,46,5,2,0,0,46,47,3,14,7,0,47,48,5,3,
+        0,0,48,49,5,4,0,0,49,50,3,2,1,0,50,51,5,5,0,0,51,80,1,0,0,0,52,53,
         5,22,0,0,53,54,5,2,0,0,54,55,3,12,6,0,55,56,5,1,0,0,56,57,3,14,7,
         0,57,58,5,1,0,0,58,59,3,12,6,0,59,60,5,3,0,0,60,61,5,4,0,0,61,62,
         3,2,1,0,62,63,5,5,0,0,63,80,1,0,0,0,64,65,5,23,0,0,65,66,5,2,0,0,
@@ -56,28 +56,28 @@ def serializedATN():
         113,5,42,0,0,109,110,5,6,0,0,110,112,5,42,0,0,111,109,1,0,0,0,112,
         115,1,0,0,0,113,111,1,0,0,0,113,114,1,0,0,0,114,11,1,0,0,0,115,113,
         1,0,0,0,116,117,5,42,0,0,117,118,5,7,0,0,118,119,3,14,7,0,119,13,
-        1,0,0,0,120,121,6,7,-1,0,121,122,5,27,0,0,122,127,3,14,7,8,123,124,
-        5,9,0,0,124,127,3,14,7,2,125,127,3,16,8,0,126,120,1,0,0,0,126,123,
-        1,0,0,0,126,125,1,0,0,0,127,154,1,0,0,0,128,129,10,11,0,0,129,130,
-        5,28,0,0,130,153,3,14,7,12,131,132,10,10,0,0,132,133,5,30,0,0,133,
-        153,3,14,7,11,134,135,10,9,0,0,135,136,5,29,0,0,136,153,3,14,7,10,
-        137,138,10,7,0,0,138,139,7,0,0,0,139,153,3,14,7,8,140,141,10,6,0,
-        0,141,142,7,1,0,0,142,153,3,14,7,7,143,144,10,5,0,0,144,145,7,2,
-        0,0,145,153,3,14,7,6,146,147,10,4,0,0,147,148,7,3,0,0,148,153,3,
-        14,7,5,149,150,10,3,0,0,150,151,5,32,0,0,151,153,3,14,7,4,152,128,
-        1,0,0,0,152,131,1,0,0,0,152,134,1,0,0,0,152,137,1,0,0,0,152,140,
-        1,0,0,0,152,143,1,0,0,0,152,146,1,0,0,0,152,149,1,0,0,0,153,156,
-        1,0,0,0,154,152,1,0,0,0,154,155,1,0,0,0,155,15,1,0,0,0,156,154,1,
-        0,0,0,157,158,6,8,-1,0,158,159,3,18,9,0,159,182,1,0,0,0,160,161,
-        10,3,0,0,161,162,5,13,0,0,162,163,3,14,7,0,163,164,5,14,0,0,164,
-        181,1,0,0,0,165,166,10,2,0,0,166,167,5,40,0,0,167,168,5,42,0,0,168,
-        177,5,2,0,0,169,174,3,14,7,0,170,171,5,6,0,0,171,173,3,14,7,0,172,
-        170,1,0,0,0,173,176,1,0,0,0,174,172,1,0,0,0,174,175,1,0,0,0,175,
-        178,1,0,0,0,176,174,1,0,0,0,177,169,1,0,0,0,177,178,1,0,0,0,178,
-        179,1,0,0,0,179,181,5,3,0,0,180,160,1,0,0,0,180,165,1,0,0,0,181,
-        184,1,0,0,0,182,180,1,0,0,0,182,183,1,0,0,0,183,17,1,0,0,0,184,182,
-        1,0,0,0,185,186,5,2,0,0,186,187,3,14,7,0,187,188,5,3,0,0,188,238,
-        1,0,0,0,189,190,5,42,0,0,190,199,5,2,0,0,191,196,3,14,7,0,192,193,
+        1,0,0,0,120,121,6,7,-1,0,121,127,3,16,8,0,122,123,5,8,0,0,123,127,
+        3,14,7,10,124,125,5,27,0,0,125,127,3,14,7,9,126,120,1,0,0,0,126,
+        122,1,0,0,0,126,124,1,0,0,0,127,154,1,0,0,0,128,129,10,8,0,0,129,
+        130,5,32,0,0,130,153,3,14,7,9,131,132,10,7,0,0,132,133,7,0,0,0,133,
+        153,3,14,7,8,134,135,10,6,0,0,135,136,7,1,0,0,136,153,3,14,7,7,137,
+        138,10,5,0,0,138,139,7,2,0,0,139,153,3,14,7,6,140,141,10,4,0,0,141,
+        142,7,3,0,0,142,153,3,14,7,5,143,144,10,3,0,0,144,145,5,29,0,0,145,
+        153,3,14,7,4,146,147,10,2,0,0,147,148,5,30,0,0,148,153,3,14,7,3,
+        149,150,10,1,0,0,150,151,5,28,0,0,151,153,3,14,7,2,152,128,1,0,0,
+        0,152,131,1,0,0,0,152,134,1,0,0,0,152,137,1,0,0,0,152,140,1,0,0,
+        0,152,143,1,0,0,0,152,146,1,0,0,0,152,149,1,0,0,0,153,156,1,0,0,
+        0,154,152,1,0,0,0,154,155,1,0,0,0,155,15,1,0,0,0,156,154,1,0,0,0,
+        157,158,6,8,-1,0,158,159,3,18,9,0,159,182,1,0,0,0,160,161,10,3,0,
+        0,161,162,5,13,0,0,162,163,3,14,7,0,163,164,5,14,0,0,164,181,1,0,
+        0,0,165,166,10,2,0,0,166,167,5,40,0,0,167,168,5,42,0,0,168,177,5,
+        2,0,0,169,174,3,14,7,0,170,171,5,6,0,0,171,173,3,14,7,0,172,170,
+        1,0,0,0,173,176,1,0,0,0,174,172,1,0,0,0,174,175,1,0,0,0,175,178,
+        1,0,0,0,176,174,1,0,0,0,177,169,1,0,0,0,177,178,1,0,0,0,178,179,
+        1,0,0,0,179,181,5,3,0,0,180,160,1,0,0,0,180,165,1,0,0,0,181,184,
+        1,0,0,0,182,180,1,0,0,0,182,183,1,0,0,0,183,17,1,0,0,0,184,182,1,
+        0,0,0,185,186,5,2,0,0,186,187,3,14,7,0,187,188,5,3,0,0,188,238,1,
+        0,0,0,189,190,5,42,0,0,190,199,5,2,0,0,191,196,3,14,7,0,192,193,
         5,6,0,0,193,195,3,14,7,0,194,192,1,0,0,0,195,198,1,0,0,0,196,194,
         1,0,0,0,196,197,1,0,0,0,197,200,1,0,0,0,198,196,1,0,0,0,199,191,
         1,0,0,0,199,200,1,0,0,0,200,201,1,0,0,0,201,238,5,3,0,0,202,211,
@@ -109,7 +109,7 @@ class PELEParser ( Parser ):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [ "<INVALID>", "';'", "'('", "')'", "'{'", "'}'", "','", 
-                     "'='", "'+'", "'-'", "'*'", "'/'", "'%'", "'['", "']'", 
+                     "'='", "'-'", "'*'", "'/'", "'%'", "'+'", "'['", "']'", 
                      "'true'", "'false'", "<INVALID>", "'si'", "'sino'", 
                      "'mostrar'", "'mientras'", "'por'", "'for'", "'in'", 
                      "'funcion'", "'retornar'", "'no'", "'|>'", "'&&'", 
@@ -295,7 +295,7 @@ class PELEParser ( Parser ):
             self.state = 28
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 31336332501524) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 31336332501268) != 0):
                 self.state = 25
                 self.statement()
                 self.state = 30
@@ -1373,31 +1373,31 @@ class PELEParser ( Parser ):
             self.state = 126
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [27]:
-                localctx = PELEParser.NotExprContext(self, localctx)
+            if token in [2, 4, 13, 15, 16, 17, 39, 42, 43, 44]:
+                localctx = PELEParser.PostfixExprContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
 
                 self.state = 121
-                self.match(PELEParser.NOT)
-                self.state = 122
-                self.expr(8)
+                self.postfix(0)
                 pass
-            elif token in [9]:
+            elif token in [8]:
                 localctx = PELEParser.UnaryMinusExprContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
+                self.state = 122
+                self.match(PELEParser.T__7)
                 self.state = 123
-                self.match(PELEParser.T__8)
-                self.state = 124
-                self.expr(2)
+                self.expr(10)
                 pass
-            elif token in [2, 4, 13, 15, 16, 17, 39, 42, 43, 44]:
-                localctx = PELEParser.PostfixExprContext(self, localctx)
+            elif token in [27]:
+                localctx = PELEParser.NotExprContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
+                self.state = 124
+                self.match(PELEParser.NOT)
                 self.state = 125
-                self.postfix(0)
+                self.expr(9)
                 pass
             else:
                 raise NoViableAltException(self)
@@ -1415,127 +1415,127 @@ class PELEParser ( Parser ):
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,6,self._ctx)
                     if la_ == 1:
-                        localctx = PELEParser.PipeExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
+                        localctx = PELEParser.PowerExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
                         self.state = 128
-                        if not self.precpred(self._ctx, 11):
+                        if not self.precpred(self._ctx, 8):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 11)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 8)")
                         self.state = 129
-                        self.match(PELEParser.PIPE)
+                        self.match(PELEParser.POW)
                         self.state = 130
-                        self.expr(12)
+                        self.expr(9)
                         pass
 
                     elif la_ == 2:
-                        localctx = PELEParser.OrExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
+                        localctx = PELEParser.MulDivModExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
                         self.state = 131
-                        if not self.precpred(self._ctx, 10):
-                            from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 10)")
-                        self.state = 132
-                        self.match(PELEParser.OR)
-                        self.state = 133
-                        self.expr(11)
-                        pass
-
-                    elif la_ == 3:
-                        localctx = PELEParser.AndExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
-                        self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 134
-                        if not self.precpred(self._ctx, 9):
-                            from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 9)")
-                        self.state = 135
-                        self.match(PELEParser.AND)
-                        self.state = 136
-                        self.expr(10)
-                        pass
-
-                    elif la_ == 4:
-                        localctx = PELEParser.EqExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
-                        self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 137
                         if not self.precpred(self._ctx, 7):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 7)")
-                        self.state = 138
+                        self.state = 132
                         _la = self._input.LA(1)
-                        if not(_la==33 or _la==34):
+                        if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 3584) != 0)):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 139
+                        self.state = 133
                         self.expr(8)
                         pass
 
-                    elif la_ == 5:
-                        localctx = PELEParser.RelationalExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
+                    elif la_ == 3:
+                        localctx = PELEParser.AddSubExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 140
+                        self.state = 134
                         if not self.precpred(self._ctx, 6):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
-                        self.state = 141
+                        self.state = 135
+                        _la = self._input.LA(1)
+                        if not(_la==8 or _la==12):
+                            self._errHandler.recoverInline(self)
+                        else:
+                            self._errHandler.reportMatch(self)
+                            self.consume()
+                        self.state = 136
+                        self.expr(7)
+                        pass
+
+                    elif la_ == 4:
+                        localctx = PELEParser.RelationalExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
+                        self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
+                        self.state = 137
+                        if not self.precpred(self._ctx, 5):
+                            from antlr4.error.Errors import FailedPredicateException
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
+                        self.state = 138
                         _la = self._input.LA(1)
                         if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 515396075520) != 0)):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 142
-                        self.expr(7)
-                        pass
-
-                    elif la_ == 6:
-                        localctx = PELEParser.AddSubExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
-                        self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 143
-                        if not self.precpred(self._ctx, 5):
-                            from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
-                        self.state = 144
-                        _la = self._input.LA(1)
-                        if not(_la==8 or _la==9):
-                            self._errHandler.recoverInline(self)
-                        else:
-                            self._errHandler.reportMatch(self)
-                            self.consume()
-                        self.state = 145
+                        self.state = 139
                         self.expr(6)
                         pass
 
-                    elif la_ == 7:
-                        localctx = PELEParser.MulDivModExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
+                    elif la_ == 5:
+                        localctx = PELEParser.EqExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 146
+                        self.state = 140
                         if not self.precpred(self._ctx, 4):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 4)")
-                        self.state = 147
+                        self.state = 141
                         _la = self._input.LA(1)
-                        if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 7168) != 0)):
+                        if not(_la==33 or _la==34):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 148
+                        self.state = 142
                         self.expr(5)
                         pass
 
-                    elif la_ == 8:
-                        localctx = PELEParser.PowerExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
+                    elif la_ == 6:
+                        localctx = PELEParser.AndExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                        self.state = 149
+                        self.state = 143
                         if not self.precpred(self._ctx, 3):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 3)")
-                        self.state = 150
-                        self.match(PELEParser.POW)
-                        self.state = 151
+                        self.state = 144
+                        self.match(PELEParser.AND)
+                        self.state = 145
                         self.expr(4)
+                        pass
+
+                    elif la_ == 7:
+                        localctx = PELEParser.OrExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
+                        self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
+                        self.state = 146
+                        if not self.precpred(self._ctx, 2):
+                            from antlr4.error.Errors import FailedPredicateException
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 2)")
+                        self.state = 147
+                        self.match(PELEParser.OR)
+                        self.state = 148
+                        self.expr(3)
+                        pass
+
+                    elif la_ == 8:
+                        localctx = PELEParser.PipeExprContext(self, PELEParser.ExprContext(self, _parentctx, _parentState))
+                        self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
+                        self.state = 149
+                        if not self.precpred(self._ctx, 1):
+                            from antlr4.error.Errors import FailedPredicateException
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 1)")
+                        self.state = 150
+                        self.match(PELEParser.PIPE)
+                        self.state = 151
+                        self.expr(2)
                         pass
 
              
@@ -1716,7 +1716,7 @@ class PELEParser ( Parser ):
                         self.state = 177
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
-                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & 31336215847444) != 0):
+                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & 31336215847188) != 0):
                             self.state = 169
                             self.expr(0)
                             self.state = 174
@@ -2085,7 +2085,7 @@ class PELEParser ( Parser ):
                 self.state = 199
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & 31336215847444) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & 31336215847188) != 0):
                     self.state = 191
                     self.expr(0)
                     self.state = 196
@@ -2114,7 +2114,7 @@ class PELEParser ( Parser ):
                 self.state = 211
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & 31336215847444) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & 31336215847188) != 0):
                     self.state = 203
                     self.expr(0)
                     self.state = 208
@@ -2313,35 +2313,35 @@ class PELEParser ( Parser ):
 
     def expr_sempred(self, localctx:ExprContext, predIndex:int):
             if predIndex == 0:
-                return self.precpred(self._ctx, 11)
+                return self.precpred(self._ctx, 8)
          
 
             if predIndex == 1:
-                return self.precpred(self._ctx, 10)
-         
-
-            if predIndex == 2:
-                return self.precpred(self._ctx, 9)
-         
-
-            if predIndex == 3:
                 return self.precpred(self._ctx, 7)
          
 
-            if predIndex == 4:
+            if predIndex == 2:
                 return self.precpred(self._ctx, 6)
          
 
-            if predIndex == 5:
+            if predIndex == 3:
                 return self.precpred(self._ctx, 5)
          
 
-            if predIndex == 6:
+            if predIndex == 4:
                 return self.precpred(self._ctx, 4)
          
 
-            if predIndex == 7:
+            if predIndex == 5:
                 return self.precpred(self._ctx, 3)
+         
+
+            if predIndex == 6:
+                return self.precpred(self._ctx, 2)
+         
+
+            if predIndex == 7:
+                return self.precpred(self._ctx, 1)
          
 
     def postfix_sempred(self, localctx:PostfixContext, predIndex:int):

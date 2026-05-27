@@ -20,6 +20,8 @@ def main():
     libs = [
         "pele_math.pele",
         "pele_numpy.pele",
+        "pele_structs.pele",
+        "pele_pandas.pele",
         "pele_tensor.pele",
         "pele_random.pele",
         "pele_losses.pele",

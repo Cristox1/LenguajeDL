@@ -1,317 +1,131 @@
-# PELE - Proyecto de Lenguaje de Programacion
+# PELE - Lenguaje de Programación para Deep Learning y Machine Learning
 
-Este repositorio contiene el desarrollo de un lenguaje de programacion interpretado y construido desde cero, disenado con una orientacion futura hacia el Deep Learning. El proyecto utiliza ANTLR4 para la generacion del analizador lexico y sintactico (Parser/Lexer), y Python como lenguaje anfitrion para la logica de evaluacion y el arbol de sintaxis abstracta (AST).
+Este repositorio contiene el desarrollo del lenguaje de programación **PELE**, diseñado bajo un **paradigma funcional puro** y enfocado enteramente en el diseño, preparación de datos, entrenamiento y evaluación de modelos de **Machine Learning y Deep Learning**. 
 
-## Caracteristicas Actuales
+El núcleo del lenguaje utiliza **ANTLR4** para el análisis léxico y sintáctico (Parser/Lexer), con **Python** únicamente como máquina virtual / intérprete de bajo nivel (AST Evaluator). Siguiendo una **regla de oro estricta**, el intérprete no contiene lógica externa ni dependencias de Python; todo el ecosistema matemático, estructural y predictivo de PELE está escrito de forma nativa en archivos `.pele` bajo abstracciones funcionales puras.
 
-El lenguaje PELE ha evolucionado significativamente, logrando la completitud de Turing al soportar las siguientes caracteristicas:
+---
 
-*   **Tipos de datos:** Soporte nativo para numeros enteros (INT), de punto flotante (FLOAT), valores booleanos (true, false) y cadenas de texto (Strings).
-*   **Estructuras de datos avanzadas:** Soporte nativo y funciones integradas para Arreglos (listas 1D), Mapas (diccionarios), Pilas, Colas, Conjuntos, Matrices, Arboles y Grafos.
-*   **Manejo de Memoria y Ambitos (Scopes):** Sistema de asignacion de variables con soporte para una Pila de Llamadas (Call Stack), lo que permite separar la memoria global de las memorias locales de ejecucion.
-*   **Operaciones aritmeticas:** Suma (+), resta (-), multiplicacion (*), division (/), modulo (%) y potencia (**). Incluye soporte para numeros negativos respetando la precedencia de operadores.
-*   **Operadores relacionales:** Comparacion logica mediante <, <=, >, >=, == y !=.
-*   **Control de flujo condicional:** Ramificacion de codigo utilizando las palabras clave nativas `si` (if), `sino` (elif) y `entonces` (else).
-*   **Control de flujo iterativo:** Soporte para bucles a traves de las instrucciones `mientras` (while) y `por` (for).
-*   **Funciones y Recursividad:** Declaracion de subrutinas definidas por el usuario con la palabra clave `funcion`, paso de parametros, y devolucion de resultados mediante `retornar`. Soporte absoluto para recursividad pura.
+## 🚀 Características y Capacidades de Deep Learning
 
-## Estructura del Proyecto
+PELE cuenta con un ecosistema completo y autónomo de librerías para resolver problemas complejos de ciencia de datos:
 
-El proyecto se compone de archivos principales creados manualmente, mas los archivos subyacentes generados por la herramienta ANTLR4:
+1. **Estructuras de Datos 100% Nativas (`pele_structs.pele`):**
+   * Pilas y Colas funcionales mediante cortes de arreglos.
+   * Conjuntos inmutables con operaciones de pertenencia y unicidad.
+   * Árboles con recorridos en preorden e inorden recursivos.
+   * Grafos mediante listas de adyacencia dinámicas con algoritmos BFS (búsqueda a lo ancho) y DFS (búsqueda a lo profundo) recursivos.
+2. **Cómputo Multidimensional y Tensores (`pele_numpy.pele`, `pele_tensor.pele`):**
+   * Creación de arrays de NumPy nativos (`np_array`).
+   * Operaciones matriciales complejas: transposición, suma, resta, producto escalar, producto por escalares y multiplicación de matrices en 2D (`np_matmul`).
+   * Atributos de dimensiones (`np_shape`).
+3. **Data Wrangling & ETL con Pandas (`pele_pandas.pele`):**
+   * **`pd_read_csv`**: Carga y parsea textos planos CSV de manera dinámica reconociendo cabeceras e infiriendo tipos numéricos (enteros y decimales).
+   * Proyección y selección de subconjuntos de columnas, eliminación inmutable de características y limpieza de nulos (`pd_fill_na`).
+   * **`pd_one_hot_encode`**: Codificación One-Hot para convertir columnas de categorías de texto a matrices binarias ($0$/$1$), indispensables para alimentar clasificadores.
+4. **Algoritmos y Modelos Predictivos (`pele_ml.pele`):**
+   * **Perceptrón de Rosenblatt:** Clasificador lineal entrenado nativamente.
+   * **Regresión Lineal Simple y Múltiple:** Ajuste de pesos mediante Descenso de Gradiente estocástico.
+   * **K-Nearest Neighbors (KNN):** Clasificador de vecinos más cercanos usando métricas de distancia Euclidiana.
+   * **K-Means Clustering:** Agrupación espacial no supervisada de centroides dinámicos.
+5. **Métricas de Rendimiento Avanzadas (`pele_metrics.pele`):**
+   * Métricas de clasificación: Exactitud (Accuracy), Precisión, Sensibilidad (Recall) y Puntuación F1.
+   * Matriz de confusión multiclasificación de dos dimensiones generada dinámicamente.
+   * Coeficiente de determinación ($R^2$) para evaluar modelos de regresión.
+6. **Redes Neuronales Artificiales (`pele_nn.pele`):**
+   * Inicialización de capas neuronales (pesos y sesgos) y propagación hacia adelante.
+7. **Visualización y Gráficos Nativos (`pele_plot.pele`):**
+   * Exportación de curvas de aprendizaje y gráficos de dispersión (Scatter Plots) a archivos vectoriales SVG nativos.
 
-*   `PELE.g4`: Archivo principal de gramatica. Define las reglas lexicas (tokens) y sintacticas del lenguaje.
-*   `visitorPELE.py`: Implementa el patron de diseno Visitor extendiendo las clases generadas por ANTLR. Es el "motor semantico" que ejecuta el codigo.
-*   `pele.py`: Archivo de entrada principal que lee el archivo fuente, inicializa el pipeline de datos (Lexer -> Parser -> AST) y llama al Visitor.
-*   `programa.txt`: Archivo de texto plano donde se escribe el codigo fuente de PELE a ser ejecutado.
+---
 
-## Requisitos Previos
+## 📂 Estructura del Proyecto
 
-Para compilar y ejecutar este proyecto, el entorno debe contar con:
+La arquitectura del lenguaje se divide en la infraestructura del intérprete y las librerías nativas:
 
-1.  Python 3.x
-2.  Java (necesario para ejecutar la herramienta de generacion de codigo de ANTLR4)
-3.  La herramienta de linea de comandos de ANTLR4 instalada.
+### ⚙️ Núcleo del Intérprete
+*   `PELE.g4`: Gramática formal en ANTLR4. Define la precedencia matemática correcta (desde acceso a índices hasta tuberías logicas) y la sintaxis.
+*   `visitorPELE.py`: Árbol de Sintaxis Abstracta (AST). Evaluador semántico puro libre de lógica de librerías.
+*   `pele.py`: Archivo ejecutable del compilador. Inyecta el preludio de librerías en orden de dependencia y corre el código.
+*   `programa.txt`: Suite integradora de pruebas y dashboard visual.
 
-## Instalacion y Configuracion
+### 📚 Librerías Nativas (`.pele`)
+*   `pele_math.pele`: Funciones matemáticas basales (potencia, exp, log, min, max, absoluto y funciones de activación como Sigmoide y ReLU).
+*   `pele_numpy.pele`: Abstracción de tensores multidimensionales y álgebra lineal.
+*   `pele_structs.pele`: Estructuras de datos puras (pilas, colas, conjuntos, árboles y grafos).
+*   `pele_pandas.pele`: Parsea y manipula DataFrames cargados de strings CSV.
+*   `pele_tensor.pele`: Estructura base para el flujo de gradientes de tensores.
+*   `pele_random.pele`: Generador pseudoaleatorio lineal congruente (LCG) nativo para reproducibilidad de modelos.
+*   `pele_losses.pele`: Pérdidas de entropía cruzada binaria (BCE) y error cuadrático medio (MSE).
+*   `pele_metrics.pele`: Matriz de confusión y cálculo de F1 Score, Precision, Recall y R2.
+*   `pele_data.pele`: Auxiliares de data preprocesing (normalización Min-Max, estandarización Z-score).
+*   `pele_ml.pele`: Algoritmos de regresión y modelos clasificadores clásicos.
+*   `pele_nn.pele`: Componentes neuronales artificiales.
+*   `pele_plot.pele`: Generación directa de reportes gráficos en SVG.
 
-Pasos para configurar el entorno de desarrollo en sistemas basados en Unix (Linux/macOS):
+---
 
-1.  **Crear un entorno virtual:**
-    ```bash
-    python3 -m venv env
-    ```
+## 🛠️ Requisitos Previos e Instalación
 
-2.  **Activar el entorno virtual:**
-    ```bash
-    source env/bin/activate
-    ```
+1. **Entorno de Software:**
+   * Python 3.x
+   * Java JRE/JDK (solo si deseas compilar la gramática `PELE.g4`)
+   * Herramienta ANTLR4 instalada.
 
-3.  **Instalar las dependencias de Python:**
-    ```bash
-    pip install antlr4-python3-runtime
-    ```
+2. **Instalación de Dependencias:**
+   ```bash
+   # Crear entorno virtual
+   python3 -m venv env
+   source env/bin/activate
 
-## Compilacion y Ejecucion
+   # Instalar runtime de ANTLR
+   pip install antlr4-python3-runtime
+   ```
 
-Cada vez que se realicen modificaciones estructurales en la gramatica (`PELE.g4`), es necesario volver a generar los analizadores:
+3. **Compilación de la Gramática (Opcional si editas `PELE.g4`):**
+   ```bash
+   antlr4 -Dlanguage=Python3 -visitor PELE.g4
+   ```
 
-1.  **Generar el codigo de ANTLR:**
-    ```bash
-    antlr4 -Dlanguage=Python3 -visitor PELE.g4
-    ```
+4. **Ejecutar el Dashboard de Pruebas:**
+   ```bash
+   python3 pele.py
+   ```
 
-2.  **Ejecutar el programa:**
-    Asegurate de escribir tu codigo en el archivo `programa.txt` y luego ejecuta el interprete:
-    ```bash
-    python3 pele.py
-    ```
+---
 
-## Ejemplo de Codigo en PELE
+## 📝 Ejemplo de Flujo de ML Completo en PELE
 
-El lenguaje ahora es capaz de ejecutar algoritmos complejos como la recursividad. Un ejemplo del codigo que puedes escribir en `programa.txt` es:
+Puedes cargar un dataset CSV, limpiar características nulas, codificar variables cualitativas a binarias, entrenar un clasificador y evaluar métricas de precisión directamente en PELE:
 
 ```text
-    // 1. Condicionales y Ciclos
-    por (i = 0; i < 5; i = i + 1) {
-        si (i % 2 == 0) {
-            mostrar("Es par:");
-        } sino (i == 3) {
-            mostrar("Es el numero tres");
-        } entonces {
-            mostrar("Es otro impar");
-        }
-        mostrar(i);
-    }
+// 1. Cargar Datos con Pandas
+csv_txt = "edad,salario,compra,categoria\n25,40000.0,0,Premium\n32,54000.0,1,Standard\n47,80000.0,1,Premium\n";
+df = pd_read_csv(csv_txt);
 
-    // 2. Funciones de usuario y Recursividad
-    funcion factorial(n) {
-        si (n <= 1) {
-            retornar 1;
-        }
-        retornar n * factorial(n - 1);
-    }
+// 2. Codificación One-Hot
+df_codificado = pd_one_hot_encode(df, "categoria");
 
-    resultado = factorial(5);
-    mostrar("El factorial de 5 es:");
-    mostrar(resultado);
+// 3. Selección de características y objetivos
+X = pd_select_columns(df_codificado, ["edad", "salario"]);
+y = pd_get_column(df_codificado, "compra");
+
+// 4. Entrenar y Evaluar Métricas
+y_real = [1, 0, 1, 1, 0, 1, 0, 0];
+y_pred = [1, 0, 1, 0, 0, 1, 1, 0];
+
+mostrar("Metricas del Modelo:");
+mostrar("Precision:");
+mostrar(precision(y_real, y_pred, 1)); // Retorna 0.75
+mostrar("Confusion Matrix:");
+mostrar(confusion_matrix(y_real, y_pred)); // Retorna [[3, 1], [1, 3]]
 ```
 
 ---
 
-# Historial de Avances
+## 📈 Historial de Avances
 
-## Avances Recientes:
-
-En las ultimas iteraciones, el lenguaje PELE sufrio una transformacion arquitectonica profunda para pasar de ser una calculadora secuencial a un lenguaje de programacion completo:
-
-1. **Lectura de codigo desde archivo:** Se abstrajo la ejecucion hacia `programa.txt` para separar el interprete del codigo fuente.
-2. **Control de Flujo:** Se anadieron reglas sintacticas y semanticas para soportar decisiones logicas (`si`, `sino`, `entonces`) y bucles (`por`, `mientras`).
-3. **Pila de Llamadas (Call Stack):** Se reemplazo la memoria global estatica por un sistema de contextos dinamicos (Scopes) basados en diccionarios apilados, vital para aislar variables locales.
-4. **Funciones Personalizadas:** Se integro el soporte para que el usuario defina bloques de codigo reusables y pueda utilizar la palabra clave `retornar` (implementada mediante interrupciones de excepcion en el arbol AST).
-5. **Pruebas Exhaustivas:** Se construyo un script de pruebas robusto que valida todos los tipos de datos, operaciones matematicas, y todas las estructuras de datos complejas (desde arreglos hasta grafos).
-
-#### Resumen
-PELE es un lenguaje educativo/intermedio con:
-- Gramática en `PELE.g4` (ANTLR4).
-- Evaluador/ejecutor en `visitorPELE.py` (patrón Visitor).
-- Ejecutable de entrada en `pele.py`.
-- Archivo fuente de ejemplo: `programa.txt`.
-
-### Características Actuales
-
-#### Tipos de datos
-- INT (enteros), FLOAT (decimales), BOOLEAN (`true` / `false`), STRING (cadenas entre comillas).
-- Arreglos literales: `[1, 2, 3]` (listas 1D).
-
-### Ciclos (iteración)
-
-#### Soporte actual
-PELE soporta dos estilos de bucles:
-
-- Bucle while con palabra clave `mientras`:
-  - Sintaxis: `mientras (condicion) { ... }`
-  - El cuerpo se ejecuta mientras la condición booleana sea verdadera.
-  - Ejemplo:
-    ```text
-    contador = 0;
-    mientras (contador < 5) {
-        mostrar(contador);
-        contador = contador + 1;
-    }
-    ```
-
-- Bucle for estilo C con palabra clave `por`:
-  - Sintaxis: `por (inicializacion; condicion; incremento) { ... }`
-  - Implementado como: ejecutar la asignación inicial, evaluar condición, ejecutar cuerpo, ejecutar incremento, repetir.
-  - Atención: el visitor ejecuta manualmente las asignaciones inicial e incremento para actualizar correctamente las variables del scope.
-  - Ejemplo:
-    ```text
-    por (i = 0; i < 5; i = i + 1) {
-        mostrar(i);
-    }
-    ```
-
-- Bucle for-each (iteración sobre arreglos) con `for (id in arr)`:
-  - Sintaxis: `for (x in nums) { ... }`
-  - Requiere que `nums` sea un arreglo (lista).
-  - Ejemplo:
-    ```text
-    nums = [0,1,2,3,4];
-    for (x in nums) {
-        mostrar(x);
-    }
-    ```
-
-#### Comportamiento de errores en ciclos
-- Si ocurre una excepción dentro del cuerpo de un ciclo, existe manejo centralizado en `visitBlock` que imprime el error con la línea y, por defecto, continúa la ejecución (no detiene todo el programa).  
-- Puedes forzar que el intérprete se detenga en el primer error activando `visitor.stop_on_error = True` (el wrapper `run_code` acepta este parámetro).
-
-### Estructuras de datos (implementadas como builtins)
-
-PELE expone un conjunto de funciones nativas (builtins) que implementan las estructuras solicitadas sin dependencias externas. Se usan desde el código PELE mediante llamadas de función, p. ej. `crear_pila()`, `mapa_get(m, "k")`.
-
-#### Arreglos (listas 1D)
-- Literal: `[1, 2, 3]`
-- Helpers: `arr_get(arr, idx)`, `arr_set(arr, idx, val)`.
-
-#### Mapas (diccionarios)
-- Crear desde pares: `crear_mapa([["k1", v1], ["k2", v2]])`
-- Operaciones: `mapa_get(m, k)`, `mapa_put(m, k, v)`, `mapa_keys(m)`, `mapa_values(m)`.
-
-#### Pilas
-- `crear_pila()` → devuelve una lista usada como pila.
-- `pila_push(stack, value)`, `pila_pop(stack)`.
-
-#### Colas
-- `crear_cola()` → lista usada como cola FIFO.
-- `cola_enqueue(queue, value)`, `cola_dequeue(queue)`.
-
-#### Conjuntos
-- `crear_conjunto(arr)` → crea un `set` desde un arreglo.
-- `conjunto_add(s, v)`, `conjunto_contains(s, v)`.
-
-#### Matrices
-- `crear_matriz(rows, cols, fill)` → crea matriz (lista de listas).
-- `mat_get(mat, i, j)`, `mat_set(mat, i, j, val)`.
-
-#### Árboles (nodo simple)
-- Nodo representado como `{'value': ..., 'children': [...]}` en el visitor.
-- `crear_arbol(valor)`, `arbol_add_child(node, child)`, `arbol_preorder(node)`.
-
-#### Grafos (lista de adyacencia)
-- `crear_grafo()` → diccionario de adyacencia.
-- `grafo_add_node(g, node)`, `grafo_add_edge(g, u, v)`, `grafo_neighbors(g, node)`, `grafo_bfs(g, start)`.
-
-#### Notas sobre estructuras
-- Todas las estructuras son implementadas en `visitorPELE.py` como funciones Python (builtins) y devuelven/aceptan estructuras Python nativas (listas, dicts, sets).
-- La salida de `mostrar(...)` formatea estas estructuras para una visualización legible (función `_format_value`).
-- Validaciones mínimas de tipo están implementadas; si se pasa un tipo incorrecto, se lanza una excepción capturada por `visitBlock`.
-
-### Funciones y Recursividad
-
-#### Soporte actual
-- Declaración de funciones: `funcion nombre(params...) { block }`
-- Retorno: `retornar expr;`
-- Llamada: `resultado = nombre(arg1, arg2);`
-- Recursividad: soportada plenamente (pila de scopes + excepción interna `ReturnValue` para implementar la salida de `retornar`).
-
-#### Implementación interna
-- Las funciones definidas por el usuario se almacenan en `self.functions` (nombre → {params, block_ctx}).
-- Al llamar una función:
-  - Se crea un nuevo scope (push).
-  - Se asignan los parámetros en el scope local.
-  - Se ejecuta su `block` y se captura `ReturnValue` para obtener el valor de retorno.
-  - Se restablece el scope (pop).
-- Si la función termina sin `retornar`, devuelve `None`.
-
-#### Ejemplo (factorial recursivo)
-```text
-funcion factorial(n) {
-    si (n <= 1) {
-        retornar 1;
-    }
-    retornar n * factorial(n - 1);
-}
-
-mostrar(factorial(5)); // imprime 120
-```
-
-#### Scopes y variables locales
-- El intérprete mantiene una pila de scopes (listas de diccionarios). Las variables definidas dentro de una función no contaminan el scope global.
-- Acceso a variables sigue la búsqueda desde el scope actual hacia afuera (shadowing permitido).
-
-### Condicionales (control de flujo condicional)
-
-#### Soporte actual
-- `si (cond) { ... } (sino { ... })?` — rama simple con opcional `sino`.
-- En la gramática también se admiten variantes con `sino` que contienen otro `block`.
-- Condiciones evaluadas son expresiones booleanas (resultado de comparaciones o valores booleanos).
-- Ejemplo:
-```text
-si (x < 0) {
-    mostrar("negativo");
-} sino {
-    mostrar("no negativo");
-}
-```
-
-#### Evaluación y errores
-- Si la condición no evalúa a booleano (ej. un número), el visitor puede lanzar un `TypeError` en contextos concretos (por ejemplo en `while` se valida que la condición sea booleana).
-- Errores en bloques condicionales son capturados por `visitBlock` y reportados con la línea; ejecución continúa a menos que `stop_on_error` sea True.
-
-### Manejo de errores global (try/except en el visitor)
-- `visitBlock` contiene un `try/except` que:
-  - Captura excepciones lanzadas al ejecutar cada `statement`.
-  - Intenta extraer `line` desde el token `start` del `stmt` para reportar la línea.
-  - Imprime: `[Linea X] Error en statement: <mensaje>`.
-  - Si `self.stop_on_error` es True, relanza la excepción (detiene ejecución).
-  - `ReturnValue` (la excepción usada para `retornar`) se re-lanza para permitir que `retornar` salga correctamente de funciones.
-- Esto permite que el script de pruebas (programa.txt) muestre varios errores en una sola ejecución sin detenerse inmediatamente.
-
-### Ejecución y pruebas
-
-#### Generar artefactos ANTLR
-```bash
-antlr4 -Dlanguage=Python3 -visitor PELE.g4
-```
-(o usar el jar de ANTLR si no tienes el wrapper).
-
-#### Ejecutar intérprete
-- Coloca tu código en `programa.txt` y ejecuta:
-```bash
-python3 pele.py
-```
-- Para tests desde Python y detener en primer error:
-```python
-from pele import run_code
-run_code(open("programa.txt").read(), stop_on_error=True)
-```
-
-### Ejemplos de uso (resumen)
-
-- Ciclos:
-```text
-por (i = 0; i < 5; i = i + 1) { mostrar(i); }
-mientras (cond) { ... }
-for (x in arr) { ... }
-```
-
-- Condicionales:
-```text
-si (cond) { ... } sino { ... }
-```
-
-- Funciones:
-```text
-funcion suma(a,b) {
-    retornar a + b;
-}
-mostrar(suma(2,3));
-```
-
-- Estructuras (ejemplos):
-```text
-p = crear_pila(); pila_push(p, 1); mostrar(pila_pop(p));
-m = crear_mapa([["k", 1]]); mostrar(mapa_get(m, "k"));
-mat = crear_matriz(2,2,0); mat_set(mat,0,1,42); mostrar(mat);
-```
+*   **Fase 1 (Sintaxis Base):** Control de flujo (`si`, `mientras`, `por`), funciones, ámbitos de memoria (Scopes) y recursividad.
+*   **Fase 2 (Autonomía de Librerías):** Remoción absoluta de las dependencias externas del visitor. Todo el software estructurado (grafos, árboles, pilas) fue reescrito de forma nativa en PELE.
+*   **Fase 3 (Corrección del Parser):** Reordenamiento de la gramática `PELE.g4` para corregir la precedencia de ANTLR4 de arriba a abajo. Esto permitió evaluar expresiones complejas (ej. comparadores relacionales seguidos de sumas `tp + fp == 0`) de forma matemáticamente exacta.
+*   **Fase 4 (Data Science & Pandas):** Creación de `pele_pandas.pele` e integración de la suite integradora visual `programa.txt` que corre y reporta el paso del 100% de los tests en la consola.

@@ -1,179 +1,170 @@
-// ============================================================
-// PROGRAMA DE PRUEBAS COMPLETO DE PELE
-// ============================================================
+// =====================================================================
+// PELE TEST RUNNER SUITE
+// Ejecuta y valida automáticamente todas las capacidades del lenguaje
+// =====================================================================
 
-// === TEST 1: OPERADORES LOGICOS ===
-mostrar("=== TEST 1: OPERADORES LOGICOS ===");
-mostrar(true && true);
-mostrar(true && false);
-mostrar(false || true);
-mostrar(false || false);
-mostrar(no true);
-mostrar(no false);
-mostrar(" ");
+mostrar("=================================================================");
+mostrar("                PELE SUITE RUNNER DASHBOARD                      ");
+mostrar("=================================================================");
 
-// === TEST 2: ACCESO POR INDICE [] ===
-mostrar("=== TEST 2: ACCESO POR INDICE ===");
-nums = [10, 20, 30, 40, 50];
-mostrar(nums[0]);
-mostrar(nums[2]);
-mostrar(nums[4]);
-mat = [[1, 2], [3, 4]];
-mostrar(mat[0][1]);
-mostrar(mat[1][0]);
-mostrar(" ");
+global_passed = 0;
+global_tests = 0;
 
-// === TEST 3: DICCIONARIOS LITERALES ===
-mostrar("=== TEST 3: DICCIONARIOS LITERALES ===");
-persona = {nombre: "PELE", version: 2, funcional: true};
-mostrar(persona["nombre"]);
-mostrar(persona["version"]);
-mostrar(" ");
+runner_stats = [0, 0]; // [passed, total]
 
-// === TEST 4: LAMBDAS ===
-mostrar("=== TEST 4: LAMBDAS ===");
-doble = \x -> x * 2;
-mostrar(doble(5));
-mostrar(doble(21));
-mostrar(" ");
-
-// === TEST 5: PIPE OPERATOR |> ===
-mostrar("=== TEST 5: PIPE OPERATOR ===");
-resultado = 5 |> doble;
-mostrar(resultado);
-mostrar(" ");
-
-// === TEST 6: ELSE-IF ENCADENADO ===
-mostrar("=== TEST 6: ELSE-IF ENCADENADO ===");
-funcion clasificar(x) {
-    si (x > 0) {
-        retornar "positivo";
-    } sino si (x < 0) {
-        retornar "negativo";
+funcion assert(nombre, condicion) {
+    arr_set(runner_stats, 1, runner_stats[1] + 1);
+    si (condicion) {
+        mostrar("  [PASS] " + nombre);
+        arr_set(runner_stats, 0, runner_stats[0] + 1);
+        retornar true;
     } sino {
-        retornar "cero";
+        mostrar("  [FAIL] " + nombre);
+        retornar false;
     }
 }
-mostrar(clasificar(5));
-mostrar(clasificar(-3));
-mostrar(clasificar(0));
-mostrar(" ");
 
-// === TEST 7: METODOS CON DOT NOTATION ===
-mostrar("=== TEST 7: DOT NOTATION ===");
-lista = [1, 2, 3, 4, 5];
-mostrar(lista.len());
-mostrar(lista.head());
-mostrar(lista.reverse());
-mostrar(lista.contains(3));
-mostrar(lista.append(6));
-mostrar(" ");
+// -----------------------------------------------------------------
+// BLOQUE 1: CORE DEL LENGUAJE Y OPERADORES
+// -----------------------------------------------------------------
+mostrar("\n[BLOQUE 1] SINTAXIS Y OPERADORES CORE");
 
-// === TEST 8: BUILTINS FUNCIONALES ===
-mostrar("=== TEST 8: BUILTINS ===");
-mostrar(head([10, 20, 30]));
-mostrar(tail([10, 20, 30]));
-mostrar(append([1, 2], 3));
-mostrar(range(5));
-mostrar(" ");
+assert("Operadores logicos (&&, ||, no)", (true && true) && (false || true) && (no false));
 
-// === TEST 9: FOR SOBRE STRING ===
-mostrar("=== TEST 9: FOR STRING ===");
-for (c in "PELE") {
-    mostrar(c);
+nums = [10, 20, 30, 40, 50];
+assert("Acceso por indice [] en listas", nums[0] == 10 && nums[2] == 30 && nums[4] == 50);
+
+persona = {nombre: "PELE", version: 2, funcional: true};
+assert("Diccionarios literales {} y acceso", persona["nombre"] == "PELE" && persona["version"] == 2 && persona["funcional"]);
+
+doble = \x -> x * 2;
+assert("Funciones anonimas (Lambdas)", doble(5) == 10 && doble(21) == 42);
+
+res_pipe = 5 |> doble;
+assert("Operador Pipeline (|>) con Lambdas", res_pipe == 10);
+
+funcion clasificar(x) {
+    si (x > 0) { retornar "pos"; }
+    sino si (x < 0) { retornar "neg"; }
+    sino { retornar "cero"; }
 }
-mostrar(" ");
+assert("Estructura Condicional Else-If", clasificar(5) == "pos" && clasificar(-3) == "neg" && clasificar(0) == "cero");
 
-// === TEST 10: ARITMETICA VECTORIAL ===
-mostrar("=== TEST 10: VECTORES ===");
-a = [1, 2, 3];
-b = [4, 5, 6];
-mostrar(a + b);
-mostrar(b - a);
-mostrar(2 * a);
-mostrar(" ");
+lista = [1, 2, 3, 4, 5];
+assert("Dot Notation en Listas (.len, .head, .contains)", lista.len() == 5 && lista.head() == 1 && lista.contains(3));
 
-// === TEST 11: REGRESION LINEAL ===
-mostrar("=== TEST 11: REGRESION LINEAL ===");
-X_lr = [[1.0, 1.0], [1.0, 2.0], [2.0, 2.0], [2.0, 3.0], [3.0, 3.0]];
-y_lr = [6.0, 9.0, 11.0, 14.0, 16.0];
-modelo_lr = linreg_fit(X_lr, y_lr, 0.005, 2000);
-pred_lr = linreg_predict(modelo_lr, X_lr);
-mostrar("Predicciones LR:");
-mostrar(pred_lr);
-mostrar("R2:");
-mostrar(r2_score(y_lr, pred_lr));
-mostrar(" ");
+assert("Primitivas Funcionales (head, tail, range)", head([1, 2]) == 1 && tail([1, 2])[0] == 2 && longitud(range(5)) == 5);
 
-// === TEST 12: KNN ===
-mostrar("=== TEST 12: KNN ===");
-X_knn = [[1.0, 1.0], [1.5, 1.5], [2.0, 1.0], [8.0, 8.0], [8.5, 8.5], [9.0, 8.0]];
-y_knn = [0, 0, 0, 1, 1, 1];
-knn_modelo = knn_fit(X_knn, y_knn, 3);
-// Predict one by one
-mostrar("KNN single:");
-mostrar(knn_predict(knn_modelo, [1.2, 1.3]));
-mostrar(knn_predict(knn_modelo, [8.3, 8.2]));
-mostrar(" ");
+cadena_for = "";
+for (c in "PELE") {
+    cadena_for = cadena_for + c;
+}
+assert("Ciclo For-In sobre strings", cadena_for == "PELE");
 
-// === TEST 13: K-MEANS ===
-mostrar("=== TEST 13: K-MEANS ===");
-random_seed(42);
-X_km = [[0.1, 0.2], [0.3, 0.1], [0.2, 0.3], [10.1, 10.2], [9.9, 9.9], [10.2, 10.3]];
-km_modelo = kmeans_fit(X_km, 2, 50);
-asigns = mapa_get(km_modelo, "asignaciones");
-mostrar("Asignaciones:");
-mostrar(asigns);
-mostrar(asigns[0] == asigns[1]);
-mostrar(asigns[0] != asigns[3]);
-mostrar(" ");
+va = [1, 2, 3];
+vb = [4, 5, 6];
+assert("Aritmetica vectorial nativa", (va + vb)[0] == 5 && (vb - va)[2] == 3 && (2 * va)[1] == 4);
 
-// === TEST 14: METRICAS ===
-mostrar("=== TEST 14: METRICAS ===");
-y_real = [1, 0, 1, 1, 0, 1, 0, 0];
-y_pred_m = [1, 0, 1, 0, 0, 1, 1, 0];
-mostrar("Accuracy:");
-mostrar(accuracy(y_real, y_pred_m));
-mostrar("Precision (clase 1):");
-mostrar(precision(y_real, y_pred_m, 1));
-mostrar("Recall (clase 1):");
-mostrar(recall(y_real, y_pred_m, 1));
-mostrar("F1:");
-mostrar(f1_score(y_real, y_pred_m, 1));
-mostrar(" ");
-
-// === TEST 15: PERCEPTRON (AND) ===
-mostrar("=== TEST 15: PERCEPTRON AND ===");
-X_and = [
-    np_array([0, 0, 1]),
-    np_array([0, 1, 1]),
-    np_array([1, 0, 1]),
-    np_array([1, 1, 1])
-];
-Y_and = [0, 0, 0, 1];
-pesos_and = fit_perceptron(X_and, Y_and, 0.5, 200);
-pred_and = predecir_lote(pesos_and, X_and);
-mostrar("Predicciones AND:");
-mostrar(pred_and);
-mostrar("Accuracy AND:");
-mostrar(accuracy(Y_and, pred_and));
-mostrar(" ");
-
-// === TEST 16: FUNCIONES RECURSIVAS ===
-mostrar("=== TEST 16: RECURSION ===");
 funcion factorial(n) {
     si (n <= 1) { retornar 1; }
     retornar n * factorial(n - 1);
 }
-mostrar(factorial(5));
-mostrar(factorial(10));
+assert("Recursividad (Factorial)", factorial(5) == 120);
 
-funcion fibonacci(n) {
-    si (n <= 0) { retornar 0; }
-    si (n == 1) { retornar 1; }
-    retornar fibonacci(n - 1) + fibonacci(n - 2);
+// -----------------------------------------------------------------
+// BLOQUE 2: ESTRUCTURAS DE DATOS NATIVAS (pele_structs.pele)
+// -----------------------------------------------------------------
+mostrar("\n[BLOQUE 2] ESTRUCTURAS DE DATOS (100% Nativas en PELE)");
+
+p = pila_crear();
+p = pila_apilar(p, 10);
+p = pila_apilar(p, 20);
+p_tope = pila_tope(p);
+res_p = pila_desapilar(p);
+assert("Pilas (crear, apilar, tope, desapilar)", p_tope == 20 && res_p[0] == 20 && longitud(res_p[1]) == 1);
+
+c = cola_crear();
+c = cola_agregar(c, "A");
+c = cola_agregar(c, "B");
+res_c = cola_remover(c);
+assert("Colas (crear, agregar, remover)", res_c[0] == "A" && longitud(res_c[1]) == 1);
+
+s = conjunto_crear();
+s = conjunto_agregar(s, 1);
+s = conjunto_agregar(s, 2);
+s = conjunto_agregar(s, 1);
+assert("Conjuntos (agregar sin duplicados y tiene)", longitud(s) == 2 && conjunto_tiene(s, 2) && no conjunto_tiene(s, 5));
+
+raiz = arbol_crear(1);
+hijo1 = arbol_crear(2);
+raiz = arbol_agregar_hijo(raiz, hijo1);
+assert("Arboles (crear, agregar hijo y preorden)", arbol_preorden(raiz)[0] == 1 && arbol_preorden(raiz)[1] == 2);
+
+g = grafo_crear();
+g = grafo_agregar_arista(g, "A", "B");
+g = grafo_agregar_arista(g, "A", "C");
+bfs_res = grafo_bfs_nativo(g, "A");
+dfs_res = grafo_dfs(g, "A");
+assert("Grafos (adyacencia, BFS y DFS recursivos)", bfs_res[1] == "B" && dfs_res[1] == "B");
+
+// -----------------------------------------------------------------
+// BLOQUE 3: MACHINE LEARNING Y ESTADÍSTICA (pele_ml.pele)
+// -----------------------------------------------------------------
+mostrar("\n[BLOQUE 3] MACHINE LEARNING Y NUMPY NATIVOS");
+
+X_and = [np_array([0, 0, 1]), np_array([0, 1, 1]), np_array([1, 0, 1]), np_array([1, 1, 1])];
+Y_and = [0, 0, 0, 1];
+pesos_and = fit_perceptron(X_and, Y_and, 0.5, 200);
+pred_and = predecir_lote(pesos_and, X_and);
+assert("Perceptron (entrenamiento compuerta AND)", accuracy(Y_and, pred_and) == 1.0);
+
+X_lr = [[1.0, 1.0], [2.0, 1.0], [3.0, 2.0], [4.0, 3.0], [5.0, 5.0]];
+y_lr = [1.0, 2.0, 3.0, 4.0, 5.0];
+modelo_lr = linreg_fit(X_lr, y_lr, 0.005, 500);
+pred_lr = linreg_predict(modelo_lr, X_lr);
+assert("Regresion Lineal (ajuste por gradiente R2)", r2_score(y_lr, pred_lr) > 0.95);
+
+X_knn = [[1.0, 1.0], [1.5, 1.5], [8.0, 8.0], [8.5, 8.5]];
+y_knn = [0, 0, 1, 1];
+knn_mod = knn_fit(X_knn, y_knn, 3);
+assert("K-Nearest Neighbors (KNN clasificacion)", knn_predict(knn_mod, [1.2, 1.3]) == 0 && knn_predict(knn_mod, [8.3, 8.2]) == 1);
+
+random_seed(42);
+X_km = [[0.1, 0.2], [0.3, 0.1], [9.9, 9.9], [10.2, 10.3]];
+km_mod = kmeans_fit(X_km, 2, 50);
+asig = km_mod["asignaciones"];
+assert("K-Means Clustering (agrupacion espacial)", asig[0] == asig[1] && asig[0] != asig[2]);
+
+y_r = [1, 0, 1, 1, 0, 1, 0, 0];
+y_p = [1, 0, 1, 0, 0, 1, 1, 0];
+cm = confusion_matrix(y_r, y_p);
+assert("Metricas (Precision, Recall y Matriz de Confusion)", precision(y_r, y_p, 1) == 0.75 && recall(y_r, y_p, 1) == 0.75 && cm[0][0] == 3);
+
+// -----------------------------------------------------------------
+// BLOQUE 4: PANDAS Y PREPROCESAMIENTO (pele_pandas.pele)
+// -----------------------------------------------------------------
+mostrar("\n[BLOQUE 4] DATA WRANGLING CON PANDAS NATIVO");
+
+csv_txt = "edad,salario,compra,categoria\n25,40000.0,0,Premium\n32,54000.0,1,Standard\n47,80000.0,1,Premium\n";
+df = pd_read_csv(csv_txt);
+col_sal = pd_get_column(df, "salario");
+df_oh = pd_one_hot_encode(df, "categoria");
+assert("Pandas (pd_read_csv y casteo automatico)", longitud(df["data"]) == 3 && col_sal[0] == 40000.0);
+assert("Pandas (pd_one_hot_encode en variables categoricas)", df_oh["columnas"].contains("categoria_Premium") && df_oh["data"][0][3] == 1);
+
+// -----------------------------------------------------------------
+// RESUMEN FINAL
+// -----------------------------------------------------------------
+mostrar("\n=================================================================");
+mostrar("                     DASHBOARD SUMMARY                           ");
+mostrar("=================================================================");
+mostrar("  Pruebas Ejecutadas: " + a_texto(runner_stats[1]));
+mostrar("  Pruebas Exitosas:   " + a_texto(runner_stats[0]));
+mostrar("  Pruebas Fallidas:   " + a_texto(runner_stats[1] - runner_stats[0]));
+mostrar("=================================================================");
+si (runner_stats[0] == runner_stats[1]) {
+    mostrar("   ¡FELICITACIONES! PELE HA SUPERADO EL 100% DE LAS PRUEBAS    ");
+} sino {
+    mostrar("   ATENCION: ALGUNAS PRUEBAS HAN FALLADO                       ");
 }
-mostrar(fibonacci(10));
-mostrar(" ");
-
-mostrar("=== TODAS LAS PRUEBAS COMPLETADAS ===");
+mostrar("=================================================================");

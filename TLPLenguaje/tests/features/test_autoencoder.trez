@@ -1,0 +1,70 @@
+// test_autoencoder.trez — Autoencoder entrenable en TREZ
+// Arquitectura 4 → 3 → 2 (latente) → 3 → 4
+// Target = entrada. Demuestra DL no supervisado.
+
+Randomdoz.seed(11);
+
+let datos = Datadoz.read_csv("../tests/datos_test.csv");
+let f1 = Datadoz.columna(datos, "feature_1");
+let f2 = Datadoz.columna(datos, "feature_2");
+let f3 = Datadoz.columna(datos, "feature_3");
+let f4 = Datadoz.columna(datos, "feature_4");
+let lab = Datadoz.columna(datos, "label");
+
+let X = [];
+let i = 0;
+let n = len(f1);
+while (i < n) {
+    let X = append(X, [f1[i], f2[i], f3[i], f4[i]]);
+    let i = i + 1;
+}
+
+// Autoencoder: 4 → 3 → 2 → 3 → 4
+let capas = NNdoz.mlp_init([4, 3, 2, 3, 4]);
+
+// Entrenar con MSE matricial (target = X), 600 épocas
+let res  = NNdoz.mlp_train(capas, X, X, 0.02, 600, "mse");
+let hist = res["historia"];
+
+// Convergencia: la pérdida final debe ser < 30% de la inicial
+let loss0    = hist[0];
+let lossN    = hist[len(hist) - 1];
+let umbral   = loss0 * 0.3;
+mostrar(lossN < umbral);   // true
+
+// Reconstrucción: pasar X por la red completa y comparar con la entrada
+let recon = NNdoz.mlp_predict(res["layers"], X);
+mostrar(len(recon) == n);      // true: misma cantidad de filas
+mostrar(len(recon[0]) == 4);   // true: misma dimensión
+
+// Extraer espacio latente (primeras 3 capas: linear, relu, linear → 2D)
+let encoder = res["layers"].slice(0, 3);
+let salida_enc = NNdoz.sequential(encoder, X);
+let latente = salida_enc[0];
+mostrar(len(latente) == n);     // true: una fila latente por muestra
+mostrar(len(latente[0]) == 2);  // true: latente 2D
+
+// Construir x_vals, y_vals para scatter del latente completo
+let z1 = [];
+let z2 = [];
+let k = 0;
+while (k < n) {
+    let z1 = append(z1, latente[k][0]);
+    let z2 = append(z2, latente[k][1]);
+    let k = k + 1;
+}
+
+// Visualizaciones
+Plotdoz.learning_curve(hist, [], "Autoencoder — Loss MSE", "Epoca", "MSE",
+    "../tests/out_autoencoder_curve.svg");
+Plotdoz.scatter_classes(z1, z2, lab,
+    ["clase 0", "clase 1"],
+    "Espacio latente 2D", "z1", "z2",
+    "../tests/out_autoencoder_latent.svg");
+
+// Heatmap de la matriz de pesos del cuello de botella (capa 3 → 2)
+let W_bottleneck = res["layers"][2]["W"];
+Plotdoz.heatmap(W_bottleneck, "Pesos cuello de botella (3x2)",
+    "in", "out", "../tests/out_autoencoder_heatmap.svg");
+
+mostrar("Autoencoder ok");

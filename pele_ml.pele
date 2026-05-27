@@ -1,0 +1,391 @@
+// pele_ml.pele — Machine Learning Clasico
+// Implementada 100% en PELE bajo el Paradigma Funcional
+
+// ============================================================
+// REGRESION LINEAL (Gradient Descent)
+// ============================================================
+funcion _dot_vec(a, b) {
+    s = 0;
+    por (i = 0; i < longitud(a); i = i + 1) {
+        s = s + arr_get(a, i) * arr_get(b, i);
+    }
+    retornar s;
+}
+
+funcion linreg_fit(X, y, lr, epocas) {
+    n = longitud(X);
+    ncols = longitud(arr_get(X, 0));
+    // Inicializar pesos a 0
+    w = crear_pila();
+    por (j = 0; j < ncols; j = j + 1) { pila_push(w, 0.0); }
+    b = 0.0;
+    historia = crear_pila();
+    por (ep = 0; ep < epocas; ep = ep + 1) {
+        // Calcular predicciones y gradientes
+        grad_w = crear_pila();
+        por (j = 0; j < ncols; j = j + 1) { pila_push(grad_w, 0.0); }
+        grad_b = 0.0;
+        loss = 0.0;
+        por (i = 0; i < n; i = i + 1) {
+            xi = arr_get(X, i);
+            pred = _dot_vec(xi, w) + b;
+            err = pred - arr_get(y, i);
+            loss = loss + err * err;
+            por (j = 0; j < ncols; j = j + 1) {
+                arr_set(grad_w, j, arr_get(grad_w, j) + 2.0 * err * arr_get(xi, j) / n);
+            }
+            grad_b = grad_b + 2.0 * err / n;
+        }
+        // Actualizar pesos
+        por (j = 0; j < ncols; j = j + 1) {
+            arr_set(w, j, arr_get(w, j) - lr * arr_get(grad_w, j));
+        }
+        b = b - lr * grad_b;
+        pila_push(historia, loss / n);
+    }
+    retornar crear_mapa([["w", w], ["b", b], ["historia", historia]]);
+}
+
+funcion linreg_predict(modelo, X) {
+    w = mapa_get(modelo, "w");
+    b = mapa_get(modelo, "b");
+    si (es_arreglo(arr_get(X, 0))) {
+        // Batch
+        resultado = crear_pila();
+        por (i = 0; i < longitud(X); i = i + 1) {
+            pila_push(resultado, _dot_vec(arr_get(X, i), w) + b);
+        }
+        retornar resultado;
+    }
+    // Un solo punto
+    retornar _dot_vec(X, w) + b;
+}
+
+// ============================================================
+// REGRESION LOGISTICA
+// ============================================================
+funcion logreg_fit(X, y, lr, epocas) {
+    n = longitud(X);
+    ncols = longitud(arr_get(X, 0));
+    w = crear_pila();
+    por (j = 0; j < ncols; j = j + 1) { pila_push(w, 0.0); }
+    b = 0.0;
+    por (ep = 0; ep < epocas; ep = ep + 1) {
+        grad_w = crear_pila();
+        por (j = 0; j < ncols; j = j + 1) { pila_push(grad_w, 0.0); }
+        grad_b = 0.0;
+        por (i = 0; i < n; i = i + 1) {
+            xi = arr_get(X, i);
+            z = _dot_vec(xi, w) + b;
+            pred = pele_sigmoid(z);
+            err = pred - arr_get(y, i);
+            por (j = 0; j < ncols; j = j + 1) {
+                arr_set(grad_w, j, arr_get(grad_w, j) + err * arr_get(xi, j) / n);
+            }
+            grad_b = grad_b + err / n;
+        }
+        por (j = 0; j < ncols; j = j + 1) {
+            arr_set(w, j, arr_get(w, j) - lr * arr_get(grad_w, j));
+        }
+        b = b - lr * grad_b;
+    }
+    retornar crear_mapa([["w", w], ["b", b]]);
+}
+
+funcion logreg_predict(modelo, X, umbral) {
+    w = mapa_get(modelo, "w");
+    b = mapa_get(modelo, "b");
+    si (es_arreglo(arr_get(X, 0))) {
+        resultado = crear_pila();
+        por (i = 0; i < longitud(X); i = i + 1) {
+            p = pele_sigmoid(_dot_vec(arr_get(X, i), w) + b);
+            si (p >= umbral) { pila_push(resultado, 1); } sino { pila_push(resultado, 0); }
+        }
+        retornar resultado;
+    }
+    p = pele_sigmoid(_dot_vec(X, w) + b);
+    si (p >= umbral) { retornar 1; }
+    retornar 0;
+}
+
+// ============================================================
+// KNN (K-Nearest Neighbors)
+// ============================================================
+funcion _distancia_euclidiana(a, b) {
+    suma = 0;
+    por (i = 0; i < longitud(a); i = i + 1) {
+        d = arr_get(a, i) - arr_get(b, i);
+        suma = suma + d * d;
+    }
+    retornar pele_sqrt(suma);
+}
+
+funcion knn_fit(X, y, k) {
+    retornar crear_mapa([["X", X], ["y", y], ["k", k]]);
+}
+
+funcion knn_predict(modelo, punto) {
+    X = mapa_get(modelo, "X");
+    y = mapa_get(modelo, "y");
+    k = mapa_get(modelo, "k");
+    si (es_arreglo(punto) && longitud(punto) > 0 && es_arreglo(arr_get(punto, 0))) {
+        // Batch
+        resultado = crear_pila();
+        por (i = 0; i < longitud(punto); i = i + 1) {
+            pila_push(resultado, knn_predict(modelo, arr_get(punto, i)));
+        }
+        retornar resultado;
+    }
+    // Calcular distancias
+    n = longitud(X);
+    distancias = crear_pila();
+    por (i = 0; i < n; i = i + 1) {
+        d = _distancia_euclidiana(punto, arr_get(X, i));
+        pila_push(distancias, [d, i]);
+    }
+    // Ordenar por distancia (burbuja simple)
+    por (i = 0; i < n - 1; i = i + 1) {
+        por (j = 0; j < n - i - 1; j = j + 1) {
+            si (arr_get(arr_get(distancias, j), 0) > arr_get(arr_get(distancias, j + 1), 0)) {
+                tmp = arr_get(distancias, j);
+                arr_set(distancias, j, arr_get(distancias, j + 1));
+                arr_set(distancias, j + 1, tmp);
+            }
+        }
+    }
+    // Voto mayoritario de los k mas cercanos
+    conteo = crear_mapa([]);
+    por (i = 0; i < k; i = i + 1) {
+        idx = arr_get(arr_get(distancias, i), 1);
+        clase = arr_get(y, idx);
+        clave = a_texto(clase);
+        si (es_mapa(conteo)) {
+            // Buscar si existe la clave
+            claves = mapa_keys(conteo);
+            encontrado = false;
+            por (c = 0; c < longitud(claves); c = c + 1) {
+                si (arr_get(claves, c) == clave) { encontrado = true; }
+            }
+            si (encontrado) {
+                mapa_put(conteo, clave, mapa_get(conteo, clave) + 1);
+            } sino {
+                mapa_put(conteo, clave, 1);
+            }
+        }
+    }
+    // Encontrar la clase con mas votos
+    claves = mapa_keys(conteo);
+    mejor_clase = arr_get(claves, 0);
+    mejor_conteo = mapa_get(conteo, mejor_clase);
+    por (i = 1; i < longitud(claves); i = i + 1) {
+        cl = arr_get(claves, i);
+        cnt = mapa_get(conteo, cl);
+        si (cnt > mejor_conteo) {
+            mejor_conteo = cnt;
+            mejor_clase = cl;
+        }
+    }
+    // Convertir de vuelta a numero si es posible
+    retornar entero(mejor_clase);
+}
+
+// ============================================================
+// K-MEANS (Clustering)
+// ============================================================
+funcion kmeans_fit(X, k, max_iter) {
+    n = longitud(X);
+    ncols = longitud(arr_get(X, 0));
+    // Inicializar centroides con los primeros k puntos
+    centroides = crear_pila();
+    por (i = 0; i < k; i = i + 1) {
+        c = crear_pila();
+        punto = arr_get(X, i % n);
+        por (j = 0; j < ncols; j = j + 1) { pila_push(c, arr_get(punto, j)); }
+        pila_push(centroides, c);
+    }
+    asignaciones = crear_pila();
+    por (i = 0; i < n; i = i + 1) { pila_push(asignaciones, 0); }
+
+    por (iter = 0; iter < max_iter; iter = iter + 1) {
+        // Asignar cada punto al centroide mas cercano
+        por (i = 0; i < n; i = i + 1) {
+            punto = arr_get(X, i);
+            mejor_d = _distancia_euclidiana(punto, arr_get(centroides, 0));
+            mejor_c = 0;
+            por (c = 1; c < k; c = c + 1) {
+                d = _distancia_euclidiana(punto, arr_get(centroides, c));
+                si (d < mejor_d) { mejor_d = d; mejor_c = c; }
+            }
+            arr_set(asignaciones, i, mejor_c);
+        }
+        // Recalcular centroides
+        nuevos_centroides = crear_pila();
+        por (c = 0; c < k; c = c + 1) {
+            suma = crear_pila();
+            por (j = 0; j < ncols; j = j + 1) { pila_push(suma, 0.0); }
+            count = 0;
+            por (i = 0; i < n; i = i + 1) {
+                si (arr_get(asignaciones, i) == c) {
+                    punto = arr_get(X, i);
+                    por (j = 0; j < ncols; j = j + 1) {
+                        arr_set(suma, j, arr_get(suma, j) + arr_get(punto, j));
+                    }
+                    count = count + 1;
+                }
+            }
+            si (count > 0) {
+                por (j = 0; j < ncols; j = j + 1) {
+                    arr_set(suma, j, arr_get(suma, j) / count);
+                }
+            }
+            pila_push(nuevos_centroides, suma);
+        }
+        centroides = nuevos_centroides;
+    }
+    retornar crear_mapa([["centroides", centroides], ["asignaciones", asignaciones]]);
+}
+
+funcion kmeans_predict(modelo, puntos) {
+    centroides = mapa_get(modelo, "centroides");
+    k = longitud(centroides);
+    resultado = crear_pila();
+    por (i = 0; i < longitud(puntos); i = i + 1) {
+        punto = arr_get(puntos, i);
+        mejor_d = _distancia_euclidiana(punto, arr_get(centroides, 0));
+        mejor_c = 0;
+        por (c = 1; c < k; c = c + 1) {
+            d = _distancia_euclidiana(punto, arr_get(centroides, c));
+            si (d < mejor_d) { mejor_d = d; mejor_c = c; }
+        }
+        pila_push(resultado, mejor_c);
+    }
+    retornar resultado;
+}
+
+// ============================================================
+// ARBOL DE DECISION (Clasificacion simplificada)
+// ============================================================
+funcion _gini(y) {
+    n = longitud(y);
+    si (n == 0) { retornar 0.0; }
+    // Contar clases
+    conteo = crear_mapa([]);
+    por (i = 0; i < n; i = i + 1) {
+        clave = a_texto(arr_get(y, i));
+        claves = mapa_keys(conteo);
+        encontrado = false;
+        por (c = 0; c < longitud(claves); c = c + 1) {
+            si (arr_get(claves, c) == clave) { encontrado = true; }
+        }
+        si (encontrado) {
+            mapa_put(conteo, clave, mapa_get(conteo, clave) + 1);
+        } sino {
+            mapa_put(conteo, clave, 1);
+        }
+    }
+    impureza = 1.0;
+    vals = mapa_values(conteo);
+    por (i = 0; i < longitud(vals); i = i + 1) {
+        p = arr_get(vals, i) / n;
+        impureza = impureza - p * p;
+    }
+    retornar impureza;
+}
+
+funcion _clase_mayoritaria(y) {
+    conteo = crear_mapa([]);
+    por (i = 0; i < longitud(y); i = i + 1) {
+        clave = a_texto(arr_get(y, i));
+        claves = mapa_keys(conteo);
+        encontrado = false;
+        por (c = 0; c < longitud(claves); c = c + 1) {
+            si (arr_get(claves, c) == clave) { encontrado = true; }
+        }
+        si (encontrado) { mapa_put(conteo, clave, mapa_get(conteo, clave) + 1); }
+        sino { mapa_put(conteo, clave, 1); }
+    }
+    claves = mapa_keys(conteo);
+    mejor = arr_get(claves, 0);
+    mejor_cnt = mapa_get(conteo, mejor);
+    por (i = 1; i < longitud(claves); i = i + 1) {
+        cl = arr_get(claves, i);
+        cnt = mapa_get(conteo, cl);
+        si (cnt > mejor_cnt) { mejor_cnt = cnt; mejor = cl; }
+    }
+    retornar entero(mejor);
+}
+
+funcion tree_fit(X, y, max_depth) {
+    retornar _tree_build(X, y, 0, max_depth);
+}
+
+funcion _tree_build(X, y, depth, max_depth) {
+    n = longitud(y);
+    si (n == 0) { retornar crear_mapa([["hoja", true], ["clase", 0]]); }
+    si (depth >= max_depth || _gini(y) == 0) {
+        retornar crear_mapa([["hoja", true], ["clase", _clase_mayoritaria(y)]]);
+    }
+    ncols = longitud(arr_get(X, 0));
+    mejor_gini = 999999.0;
+    mejor_feat = 0;
+    mejor_umbral = 0;
+    por (f = 0; f < ncols; f = f + 1) {
+        // Probar cada valor unico como umbral
+        por (i = 0; i < n; i = i + 1) {
+            umbral = arr_get(arr_get(X, i), f);
+            y_izq = crear_pila(); y_der = crear_pila();
+            por (j = 0; j < n; j = j + 1) {
+                si (arr_get(arr_get(X, j), f) <= umbral) {
+                    pila_push(y_izq, arr_get(y, j));
+                } sino {
+                    pila_push(y_der, arr_get(y, j));
+                }
+            }
+            si (longitud(y_izq) == 0 || longitud(y_der) == 0) {
+                // Skip degenerate splits
+            } sino {
+                g = (longitud(y_izq) * _gini(y_izq) + longitud(y_der) * _gini(y_der)) / n;
+                si (g < mejor_gini) {
+                    mejor_gini = g;
+                    mejor_feat = f;
+                    mejor_umbral = umbral;
+                }
+            }
+        }
+    }
+    si (mejor_gini >= _gini(y)) {
+        retornar crear_mapa([["hoja", true], ["clase", _clase_mayoritaria(y)]]);
+    }
+    // Dividir
+    X_izq = crear_pila(); y_izq = crear_pila();
+    X_der = crear_pila(); y_der = crear_pila();
+    por (i = 0; i < n; i = i + 1) {
+        si (arr_get(arr_get(X, i), mejor_feat) <= mejor_umbral) {
+            pila_push(X_izq, arr_get(X, i)); pila_push(y_izq, arr_get(y, i));
+        } sino {
+            pila_push(X_der, arr_get(X, i)); pila_push(y_der, arr_get(y, i));
+        }
+    }
+    izq = _tree_build(X_izq, y_izq, depth + 1, max_depth);
+    der = _tree_build(X_der, y_der, depth + 1, max_depth);
+    retornar crear_mapa([["hoja", false], ["feat", mejor_feat], ["umbral", mejor_umbral], ["izq", izq], ["der", der]]);
+}
+
+funcion tree_predict(modelo, X) {
+    si (es_arreglo(X) && longitud(X) > 0 && es_arreglo(arr_get(X, 0))) {
+        resultado = crear_pila();
+        por (i = 0; i < longitud(X); i = i + 1) {
+            pila_push(resultado, tree_predict(modelo, arr_get(X, i)));
+        }
+        retornar resultado;
+    }
+    nodo = modelo;
+    mientras (mapa_get(nodo, "hoja") == false) {
+        si (arr_get(X, mapa_get(nodo, "feat")) <= mapa_get(nodo, "umbral")) {
+            nodo = mapa_get(nodo, "izq");
+        } sino {
+            nodo = mapa_get(nodo, "der");
+        }
+    }
+    retornar mapa_get(nodo, "clase");
+}

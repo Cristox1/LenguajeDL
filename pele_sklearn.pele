@@ -1,0 +1,103 @@
+// pele_sklearn.pele - Libreria de Deep Learning y Scikit-Learn
+// Implementada 100% en PELE bajo el Paradigma Funcional
+
+// ============================================================
+// FUNCIONES DE ACTIVACION
+// ============================================================
+
+funcion escalon(z) {
+    si (np_item(z) >= 0) {
+        retornar 1;
+    }
+    retornar 0;
+}
+
+// ============================================================
+// PREDICCION DEL PERCEPTRON
+// ============================================================
+
+funcion prediccion(x, w) {
+    // Producto punto entre vector x y pesos w
+    z = np_sum(np_mul(x, w), -1);
+    retornar escalon(z);
+}
+
+// ============================================================
+// PREDICCION EN LOTE (BATCH)
+// ============================================================
+
+funcion predecir_lote(modelo, X) {
+    resultados = crear_pila();
+    n = longitud(X);
+    por (i = 0; i < n; i = i + 1) {
+        x_i = arr_get(X, i);
+        y_pred = prediccion(x_i, modelo);
+        pila_push(resultados, y_pred);
+    }
+    retornar resultados;
+}
+
+// ============================================================
+// ENTRENAMIENTO DEL PERCEPTRON
+// ============================================================
+// Usamos ciclos "por" para iterar sobre los datos y epocas.
+// La inmutabilidad se preserva: en cada paso se crea un nuevo
+// tensor de pesos sin mutar el anterior.
+
+funcion fit_perceptron(X, Y, lr, epocas) {
+    // Detectar numero de features a partir del primer ejemplo
+    primer_x = arr_get(X, 0);
+    num_features = arr_get(np_shape(primer_x), 0);
+    
+    // Inicializar pesos a ceros (dinamico, segun el numero de features)
+    w = np_zeros([num_features]);
+    
+    n = longitud(X);
+    
+    // Ciclo de entrenamiento
+    por (epoca = 0; epoca < epocas; epoca = epoca + 1) {
+        por (j = 0; j < n; j = j + 1) {
+            // Extraer datos actuales
+            x_i = arr_get(X, j);
+            y_i = arr_get(Y, j);
+            
+            // Predecir
+            y_pred = prediccion(x_i, w);
+            
+            // Calcular diferencia
+            diff = y_i - y_pred;
+            
+            // Actualizar pesos: w_nuevo = w + lr * diff * x_i
+            ajuste = np_scalar_mul(lr * diff, x_i);
+            w = np_add(w, ajuste);
+        }
+    }
+    
+    retornar w;
+}
+
+// ============================================================
+// METRICAS DE EVALUACION
+// ============================================================
+
+funcion accuracy(y_real, y_pred) {
+    n = longitud(y_real);
+    aciertos = 0;
+    por (i = 0; i < n; i = i + 1) {
+        si (arr_get(y_real, i) == arr_get(y_pred, i)) {
+            aciertos = aciertos + 1;
+        }
+    }
+    retornar aciertos / n;
+}
+
+// Error cuadratico medio (MSE)
+funcion mse(y_real, y_pred) {
+    n = longitud(y_real);
+    suma = 0;
+    por (i = 0; i < n; i = i + 1) {
+        diff = arr_get(y_real, i) - arr_get(y_pred, i);
+        suma = suma + diff * diff;
+    }
+    retornar suma / n;
+}

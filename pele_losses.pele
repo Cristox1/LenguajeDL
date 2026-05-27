@@ -1,0 +1,66 @@
+// pele_losses.pele — Funciones de Perdida
+// Implementada 100% en PELE bajo el Paradigma Funcional
+
+// MSE (Mean Squared Error)
+funcion pele_mse(y_real, y_pred) {
+    n = longitud(y_real);
+    suma = 0;
+    por (i = 0; i < n; i = i + 1) {
+        diff = arr_get(y_real, i) - arr_get(y_pred, i);
+        suma = suma + diff * diff;
+    }
+    retornar suma / n;
+}
+
+// MSE Gradient
+funcion pele_mse_grad(y_real, y_pred) {
+    n = longitud(y_real);
+    grad = crear_pila();
+    por (i = 0; i < n; i = i + 1) {
+        pila_push(grad, 2.0 * (arr_get(y_pred, i) - arr_get(y_real, i)) / n);
+    }
+    retornar grad;
+}
+
+// Binary Cross-Entropy
+funcion pele_bce(y_real, y_pred) {
+    n = longitud(y_real);
+    suma = 0;
+    eps = 0.0000001;
+    por (i = 0; i < n; i = i + 1) {
+        y = arr_get(y_real, i);
+        p = arr_get(y_pred, i);
+        si (p < eps) { p = eps; }
+        si (p > 1.0 - eps) { p = 1.0 - eps; }
+        suma = suma - (y * pele_log(p) + (1.0 - y) * pele_log(1.0 - p));
+    }
+    retornar suma / n;
+}
+
+// BCE Gradient
+funcion pele_bce_grad(y_real, y_pred) {
+    n = longitud(y_real);
+    grad = crear_pila();
+    eps = 0.0000001;
+    por (i = 0; i < n; i = i + 1) {
+        y = arr_get(y_real, i);
+        p = arr_get(y_pred, i);
+        si (p < eps) { p = eps; }
+        si (p > 1.0 - eps) { p = 1.0 - eps; }
+        pila_push(grad, (p - y) / (p * (1.0 - p) * n));
+    }
+    retornar grad;
+}
+
+// Cross-Entropy (para softmax)
+funcion pele_cross_entropy(y_real, y_pred) {
+    n = longitud(y_real);
+    suma = 0;
+    eps = 0.0000001;
+    por (i = 0; i < n; i = i + 1) {
+        p = arr_get(y_pred, i);
+        si (p < eps) { p = eps; }
+        suma = suma - arr_get(y_real, i) * pele_log(p);
+    }
+    retornar suma / n;
+}

@@ -1,0 +1,269 @@
+// pele_nn.pele — Redes Neuronales con Backpropagation
+// Implementada 100% en PELE bajo el Paradigma Funcional
+
+// ============================================================
+// CAPA LINEAL
+// ============================================================
+funcion nn_linear_init(n_in, n_out) {
+    // Inicializacion Xavier simplificada
+    escala = pele_sqrt(2.0 / (n_in + n_out));
+    W = crear_pila();
+    por (i = 0; i < n_in; i = i + 1) {
+        fila = crear_pila();
+        por (j = 0; j < n_out; j = j + 1) {
+            pila_push(fila, (random_float() - 0.5) * 2.0 * escala);
+        }
+        pila_push(W, fila);
+    }
+    b = crear_pila();
+    por (j = 0; j < n_out; j = j + 1) { pila_push(b, 0.0); }
+    retornar crear_mapa([["W", W], ["b", b], ["tipo", "linear"], ["n_in", n_in], ["n_out", n_out]]);
+}
+
+funcion nn_linear_forward(capa, X) {
+    W = mapa_get(capa, "W");
+    b = mapa_get(capa, "b");
+    n_in = mapa_get(capa, "n_in");
+    n_out = mapa_get(capa, "n_out");
+    batch = longitud(X);
+    salida = crear_pila();
+    por (i = 0; i < batch; i = i + 1) {
+        xi = arr_get(X, i);
+        fila = crear_pila();
+        por (j = 0; j < n_out; j = j + 1) {
+            s = arr_get(b, j);
+            por (k = 0; k < n_in; k = k + 1) {
+                s = s + arr_get(xi, k) * arr_get(arr_get(W, k), j);
+            }
+            pila_push(fila, s);
+        }
+        pila_push(salida, fila);
+    }
+    retornar salida;
+}
+
+// ============================================================
+// ACTIVACIONES con forward/backward
+// ============================================================
+funcion nn_relu_forward(X) {
+    batch = longitud(X);
+    out = crear_pila();
+    mask = crear_pila();
+    por (i = 0; i < batch; i = i + 1) {
+        fila = arr_get(X, i);
+        o = crear_pila(); m = crear_pila();
+        por (j = 0; j < longitud(fila); j = j + 1) {
+            v = arr_get(fila, j);
+            si (v > 0) { pila_push(o, v); pila_push(m, 1.0); }
+            sino { pila_push(o, 0.0); pila_push(m, 0.0); }
+        }
+        pila_push(out, o); pila_push(mask, m);
+    }
+    retornar [out, mask];
+}
+
+funcion nn_relu_backward(mask, grad_out) {
+    batch = longitud(mask);
+    resultado = crear_pila();
+    por (i = 0; i < batch; i = i + 1) {
+        m = arr_get(mask, i);
+        g = arr_get(grad_out, i);
+        fila = crear_pila();
+        por (j = 0; j < longitud(m); j = j + 1) {
+            pila_push(fila, arr_get(g, j) * arr_get(m, j));
+        }
+        pila_push(resultado, fila);
+    }
+    retornar resultado;
+}
+
+funcion nn_sigmoid_forward(X) {
+    batch = longitud(X);
+    out = crear_pila();
+    por (i = 0; i < batch; i = i + 1) {
+        fila = arr_get(X, i);
+        o = crear_pila();
+        por (j = 0; j < longitud(fila); j = j + 1) {
+            pila_push(o, pele_sigmoid(arr_get(fila, j)));
+        }
+        pila_push(out, o);
+    }
+    retornar out;
+}
+
+funcion nn_sigmoid_backward(out, grad_out) {
+    batch = longitud(out);
+    resultado = crear_pila();
+    por (i = 0; i < batch; i = i + 1) {
+        o = arr_get(out, i);
+        g = arr_get(grad_out, i);
+        fila = crear_pila();
+        por (j = 0; j < longitud(o); j = j + 1) {
+            s = arr_get(o, j);
+            pila_push(fila, arr_get(g, j) * s * (1.0 - s));
+        }
+        pila_push(resultado, fila);
+    }
+    retornar resultado;
+}
+
+// ============================================================
+// SOFTMAX
+// ============================================================
+funcion nn_softmax(X) {
+    batch = longitud(X);
+    resultado = crear_pila();
+    por (i = 0; i < batch; i = i + 1) {
+        fila = arr_get(X, i);
+        // Estabilidad numerica: restar max
+        mx = arr_get(fila, 0);
+        por (j = 1; j < longitud(fila); j = j + 1) {
+            si (arr_get(fila, j) > mx) { mx = arr_get(fila, j); }
+        }
+        exps = crear_pila();
+        suma = 0.0;
+        por (j = 0; j < longitud(fila); j = j + 1) {
+            e = pele_exp(arr_get(fila, j) - mx);
+            pila_push(exps, e);
+            suma = suma + e;
+        }
+        fila_out = crear_pila();
+        por (j = 0; j < longitud(exps); j = j + 1) {
+            pila_push(fila_out, arr_get(exps, j) / suma);
+        }
+        pila_push(resultado, fila_out);
+    }
+    retornar resultado;
+}
+
+// ============================================================
+// MLP COMPLETO
+// ============================================================
+funcion nn_mlp_init(capas_dims) {
+    // capas_dims = [n_in, hidden1, hidden2, ..., n_out]
+    n_capas = longitud(capas_dims) - 1;
+    capas = crear_pila();
+    por (i = 0; i < n_capas; i = i + 1) {
+        capa = nn_linear_init(arr_get(capas_dims, i), arr_get(capas_dims, i + 1));
+        pila_push(capas, capa);
+    }
+    retornar crear_mapa([["capas", capas], ["n_capas", n_capas]]);
+}
+
+funcion nn_mlp_forward(modelo, X) {
+    capas = mapa_get(modelo, "capas");
+    n_capas = mapa_get(modelo, "n_capas");
+    h = X;
+    caches = crear_pila(); // Guardar para backprop
+    por (i = 0; i < n_capas; i = i + 1) {
+        pila_push(caches, h); // guardar input de la capa
+        capa = arr_get(capas, i);
+        h = nn_linear_forward(capa, h);
+        si (i < n_capas - 1) {
+            // Activacion ReLU en capas ocultas
+            relu_result = nn_relu_forward(h);
+            h = arr_get(relu_result, 0);
+            pila_push(caches, arr_get(relu_result, 1)); // mask
+        }
+    }
+    retornar [h, caches];
+}
+
+funcion nn_mlp_train(modelo, X, y, lr, epocas) {
+    capas = mapa_get(modelo, "capas");
+    n_capas = mapa_get(modelo, "n_capas");
+    batch = longitud(X);
+    historia = crear_pila();
+
+    por (ep = 0; ep < epocas; ep = ep + 1) {
+        // Forward
+        resultado = nn_mlp_forward(modelo, X);
+        output = arr_get(resultado, 0);
+        caches = arr_get(resultado, 1);
+
+        // Calcular loss (MSE) y gradiente
+        loss = 0.0;
+        grad = crear_pila();
+        n_out = longitud(arr_get(output, 0));
+        por (i = 0; i < batch; i = i + 1) {
+            grad_fila = crear_pila();
+            por (j = 0; j < n_out; j = j + 1) {
+                pred = arr_get(arr_get(output, i), j);
+                real = arr_get(arr_get(y, i), j);
+                diff = pred - real;
+                loss = loss + diff * diff;
+                pila_push(grad_fila, 2.0 * diff / (batch * n_out));
+            }
+            pila_push(grad, grad_fila);
+        }
+        pila_push(historia, loss / (batch * n_out));
+
+        // Backward pass
+        por (l = n_capas - 1; l >= 0; l = l - 1) {
+            capa = arr_get(capas, l);
+            // Obtener input de esta capa del cache
+            si (l < n_capas - 1) {
+                // Aplicar backward de ReLU
+                mask_idx = l * 2 + 1;
+                si (mask_idx < longitud(caches)) {
+                    mask = arr_get(caches, mask_idx);
+                    grad = nn_relu_backward(mask, grad);
+                }
+            }
+            input_idx = l * 2;
+            si (input_idx >= longitud(caches)) { input_idx = longitud(caches) - 1; }
+            inp = arr_get(caches, input_idx);
+
+            W = mapa_get(capa, "W");
+            b = mapa_get(capa, "b");
+            n_in = mapa_get(capa, "n_in");
+            n_out_l = mapa_get(capa, "n_out");
+
+            // Calcular gradientes de W, b, e input
+            grad_W = crear_pila();
+            por (ii = 0; ii < n_in; ii = ii + 1) {
+                fila = crear_pila();
+                por (jj = 0; jj < n_out_l; jj = jj + 1) { pila_push(fila, 0.0); }
+                pila_push(grad_W, fila);
+            }
+            grad_b = crear_pila();
+            por (jj = 0; jj < n_out_l; jj = jj + 1) { pila_push(grad_b, 0.0); }
+            grad_input = crear_pila();
+            por (i = 0; i < batch; i = i + 1) {
+                gi = crear_pila();
+                por (ii = 0; ii < n_in; ii = ii + 1) { pila_push(gi, 0.0); }
+                pila_push(grad_input, gi);
+            }
+
+            por (i = 0; i < batch; i = i + 1) {
+                g = arr_get(grad, i);
+                x = arr_get(inp, i);
+                por (jj = 0; jj < n_out_l; jj = jj + 1) {
+                    gv = arr_get(g, jj);
+                    arr_set(grad_b, jj, arr_get(grad_b, jj) + gv);
+                    por (ii = 0; ii < n_in; ii = ii + 1) {
+                        arr_set(arr_get(grad_W, ii), jj, arr_get(arr_get(grad_W, ii), jj) + arr_get(x, ii) * gv);
+                        arr_set(arr_get(grad_input, i), ii, arr_get(arr_get(grad_input, i), ii) + arr_get(arr_get(W, ii), jj) * gv);
+                    }
+                }
+            }
+
+            // Actualizar pesos
+            por (ii = 0; ii < n_in; ii = ii + 1) {
+                por (jj = 0; jj < n_out_l; jj = jj + 1) {
+                    arr_set(arr_get(W, ii), jj, arr_get(arr_get(W, ii), jj) - lr * arr_get(arr_get(grad_W, ii), jj));
+                }
+            }
+            por (jj = 0; jj < n_out_l; jj = jj + 1) {
+                arr_set(b, jj, arr_get(b, jj) - lr * arr_get(grad_b, jj));
+            }
+            grad = grad_input;
+        }
+    }
+    retornar historia;
+}
+
+funcion nn_mlp_predict(modelo, X) {
+    resultado = nn_mlp_forward(modelo, X);
+    retornar arr_get(resultado, 0);
+}

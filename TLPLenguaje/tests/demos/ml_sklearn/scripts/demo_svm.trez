@@ -1,0 +1,106 @@
+// demo_svm.trez — Support Vector Machine
+// Dataset: breast cancer (sklearn) — clasificacion binaria maligno/benigno
+// Algoritmo: Mldoz.svm_fit (hinge loss + subgradiente)
+
+Randomdoz.seed(3);
+
+let datos = Datadoz.read_csv("../tests/demos/ml_sklearn/datasets/breast_cancer.csv");
+let n = Datadoz.num_filas(datos);
+mostrar("Filas dataset breast cancer:");
+mostrar(n);
+
+let c0 = Datadoz.columna(datos, "mean_radius");
+let c1 = Datadoz.columna(datos, "mean_texture");
+let c2 = Datadoz.columna(datos, "mean_perimeter");
+let c3 = Datadoz.columna(datos, "mean_area");
+let c4 = Datadoz.columna(datos, "mean_smoothness");
+let c5 = Datadoz.columna(datos, "mean_compactness");
+let lab = Datadoz.columna(datos, "label");
+
+// Normalizar y usar etiquetas {-1, +1} que requiere SVM
+let X = [];
+let Y = [];
+let i = 0;
+while (i < n) {
+    let X = append(X, [
+        c0[i] / 30.0,
+        c1[i] / 40.0,
+        c2[i] / 200.0,
+        c3[i] / 2500.0,
+        c4[i],
+        c5[i]
+    ]);
+    // SVM usa {-1, +1}: benigno=-1, maligno=+1
+    if (int(lab[i]) == 1) {
+        let Y = append(Y, 1);
+    } else {
+        let Y = append(Y, -1);
+    }
+    let i = i + 1;
+}
+
+// Split 80/20
+let split = Datadoz.train_test_split(X, Y, 0.2);
+let Xtr_raw = split[0]; let Ytr = split[1];
+let Xte_raw = split[2]; let Yte = split[3];
+mostrar("Train / Test:");
+mostrar(len(Xtr_raw));
+mostrar(len(Xte_raw));
+
+// StandardScaler para que SVM converja bien
+let scaler = Sklearndoz.StandardScaler();
+let Xtr = Sklearndoz.fit_transform(scaler, Xtr_raw);
+let Xte = Sklearndoz.transform(scaler, Xte_raw);
+
+// Entrenar SVM lineal (lr=0.01, 1000 epocas, lam=0.001)
+let modelo = Mldoz.svm_fit(Xtr, Ytr, 0.01, 1000, 0.001);
+mostrar("Pesos del hiperplano:");
+mostrar(modelo["w"]);
+mostrar("Sesgo b:");
+mostrar(modelo["b"]);
+
+// Predecir
+let preds_svm = Mldoz.svm_predict(modelo, Xte);
+
+// Convertir {-1,+1} a {0,1} para metricas
+let preds = [];
+let Yte01 = [];
+let j = 0;
+while (j < len(preds_svm)) {
+    if (preds_svm[j] == 1) {
+        let preds = append(preds, 1);
+    } else {
+        let preds = append(preds, 0);
+    }
+    if (Yte[j] == 1) {
+        let Yte01 = append(Yte01, 1);
+    } else {
+        let Yte01 = append(Yte01, 0);
+    }
+    let j = j + 1;
+}
+
+let acc  = Metricsdoz.accuracy(Yte01, preds);
+let prec = Metricsdoz.precision(Yte01, preds, 1);
+let rec  = Metricsdoz.recall(Yte01, preds, 1);
+let f1   = Metricsdoz.f1_score(Yte01, preds, 1);
+
+mostrar("Accuracy SVM:");
+mostrar(acc);
+mostrar("Precision (maligno):");
+mostrar(prec);
+mostrar("Recall (maligno):");
+mostrar(rec);
+mostrar("F1-score:");
+mostrar(f1);
+
+// Graficas
+Plotdoz.confusion_matrix(Yte01, preds, ["Benigno", "Maligno"],
+    "SVM Lineal — Matriz de confusion",
+    "../tests/demos/ml_sklearn/resultados/out_svm_confmat.svg");
+Plotdoz.bar_chart(["Benigno", "Maligno"],
+    [Metricsdoz.precision(Yte01, preds, 0), Metricsdoz.precision(Yte01, preds, 1)],
+    "SVM — Precision por clase", "Clase", "Precision",
+    "../tests/demos/ml_sklearn/resultados/out_svm_precision.svg");
+
+mostrar("=== SVM OK ===");

@@ -1,0 +1,24 @@
+// test_perceptron.trez — Perceptrón de Rosenblatt
+
+let X = [[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]];
+
+// ── AND (linealmente separable) ───────────────────────────────────────────────
+let y_and = [0, 0, 0, 1];
+let p_and = NNdoz.perceptron_fit(X, y_and, 0.5, 200);
+let yp_and = NNdoz.perceptron_predict(p_and, X);
+mostrar(yp_and);                                   // [0, 0, 0, 1]
+mostrar(Metricsdoz.accuracy(y_and, yp_and));       // 1.0
+
+// ── OR (linealmente separable) ────────────────────────────────────────────────
+let y_or = [0, 1, 1, 1];
+let p_or = NNdoz.perceptron_fit(X, y_or, 0.5, 200);
+let yp_or = NNdoz.perceptron_predict(p_or, X);
+mostrar(yp_or);                                    // [0, 1, 1, 1]
+mostrar(Metricsdoz.accuracy(y_or, yp_or));         // 1.0
+
+// ── XOR (NO linealmente separable — el perceptrón falla) ─────────────────────
+let y_xor = [0, 1, 1, 0];
+let p_xor = NNdoz.perceptron_fit(X, y_xor, 0.5, 500);
+let yp_xor = NNdoz.perceptron_predict(p_xor, X);
+// El perceptrón NO puede aprender XOR — accuracy < 1.0
+mostrar(Metricsdoz.accuracy(y_xor, yp_xor) < 1.0);   // true

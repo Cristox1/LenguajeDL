@@ -1,0 +1,498 @@
+// pele_numpy.pele - Mini-NumPy funcional en PELE
+
+funcion np_array(data) {
+    // Si ya es un tensor (mapa con __np__)
+    si (es_mapa(data)) {
+        si (mapa_get(data, "__np__") == true) {
+            retornar data;
+        }
+    }
+    
+    // Si es numero, tensor 0D
+    si (es_numero(data)) {
+        retornar crear_mapa([["__np__", true], ["shape", []], ["ndim", 0], ["data", [data]]]);
+    }
+    
+    // Si es arreglo vacio
+    si (longitud(data) == 0) {
+        retornar crear_mapa([["__np__", true], ["shape", [0]], ["ndim", 1], ["data", []]]);
+    }
+    
+    // Verificamos si es 1D o 2D (revisando el primer elemento)
+    primer_elem = arr_get(data, 0);
+    si (es_arreglo(primer_elem)) {
+        // Es 2D
+        filas = longitud(data);
+        columnas = longitud(primer_elem);
+        datos_planos = crear_pila(); // pila actua como array mutable
+        por (i = 0; i < filas; i = i + 1) {
+            fila = arr_get(data, i);
+            por (j = 0; j < columnas; j = j + 1) {
+                pila_push(datos_planos, arr_get(fila, j));
+            }
+        }
+        retornar crear_mapa([["__np__", true], ["shape", [filas, columnas]], ["ndim", 2], ["data", datos_planos]]);
+    } sino {
+        // Es 1D
+        retornar crear_mapa([["__np__", true], ["shape", [longitud(data)]], ["ndim", 1], ["data", data]]);
+    }
+}
+
+funcion np_shape(a) {
+    t = np_array(a);
+    retornar mapa_get(t, "shape");
+}
+
+funcion _producto_lista_recursivo(lista, indice, longitud_l) {
+    si (indice == longitud_l) {
+        retornar 1;
+    }
+    retornar arr_get(lista, indice) * _producto_lista_recursivo(lista, indice + 1, longitud_l);
+}
+
+funcion _producto(lista) {
+    si (longitud(lista) == 0) {
+        retornar 1;
+    }
+    retornar _producto_lista_recursivo(lista, 0, longitud(lista));
+}
+
+funcion np_zeros(shape) {
+    size = _producto(shape);
+    data = crear_pila();
+    por (i = 0; i < size; i = i + 1) {
+        pila_push(data, 0);
+    }
+    retornar crear_mapa([["__np__", true], ["shape", shape], ["ndim", longitud(shape)], ["data", data]]);
+}
+
+funcion np_ones(shape) {
+    size = _producto(shape);
+    data = crear_pila();
+    por (i = 0; i < size; i = i + 1) {
+        pila_push(data, 1);
+    }
+    retornar crear_mapa([["__np__", true], ["shape", shape], ["ndim", longitud(shape)], ["data", data]]);
+}
+
+// RNG Funcional
+_rng_estado = [1];
+funcion np_seed(seed) {
+    arr_set(_rng_estado, 0, entero(seed));
+    retornar 0;
+}
+
+funcion _rng_next() {
+    estado = arr_get(_rng_estado, 0);
+    // LCG
+    nuevo = (1664525 * estado + 1013904223) % 4294967296;
+    arr_set(_rng_estado, 0, nuevo);
+    retornar nuevo / 4294967296.0;
+}
+
+funcion np_rand(shape) {
+    size = _producto(shape);
+    data = crear_pila();
+    por (i = 0; i < size; i = i + 1) {
+        pila_push(data, _rng_next());
+    }
+    retornar crear_mapa([["__np__", true], ["shape", shape], ["ndim", longitud(shape)], ["data", data]]);
+}
+
+funcion np_uniform(low, high, shape) {
+    size = _producto(shape);
+    span = high - low;
+    data = crear_pila();
+    por (i = 0; i < size; i = i + 1) {
+        pila_push(data, low + _rng_next() * span);
+    }
+    retornar crear_mapa([["__np__", true], ["shape", shape], ["ndim", longitud(shape)], ["data", data]]);
+}
+
+// Element-wise binario
+funcion _op_binaria(a, b, op) {
+    ta = np_array(a);
+    tb = np_array(b);
+    
+    // Asumimos shapes iguales o escalar
+    da = mapa_get(ta, "data");
+    db = mapa_get(tb, "data");
+    
+    // Si ta es 0D
+    si (mapa_get(ta, "ndim") == 0) {
+        s = arr_get(da, 0);
+        data_out = crear_pila();
+        por (i = 0; i < longitud(db); i = i + 1) {
+            v = arr_get(db, i);
+            si (op == "add") { pila_push(data_out, s + v); }
+            si (op == "sub") { pila_push(data_out, s - v); }
+            si (op == "mul") { pila_push(data_out, s * v); }
+            si (op == "div") { pila_push(data_out, s / v); }
+        }
+        retornar crear_mapa([["__np__", true], ["shape", mapa_get(tb, "shape")], ["ndim", mapa_get(tb, "ndim")], ["data", data_out]]);
+    }
+    
+    // Si tb es 0D
+    si (mapa_get(tb, "ndim") == 0) {
+        s = arr_get(db, 0);
+        data_out = crear_pila();
+        por (i = 0; i < longitud(da); i = i + 1) {
+            v = arr_get(da, i);
+            si (op == "add") { pila_push(data_out, v + s); }
+            si (op == "sub") { pila_push(data_out, v - s); }
+            si (op == "mul") { pila_push(data_out, v * s); }
+            si (op == "div") { pila_push(data_out, v / s); }
+        }
+        retornar crear_mapa([["__np__", true], ["shape", mapa_get(ta, "shape")], ["ndim", mapa_get(ta, "ndim")], ["data", data_out]]);
+    }
+    
+    // Shapes iguales
+    data_out = crear_pila();
+    por (i = 0; i < longitud(da); i = i + 1) {
+        x = arr_get(da, i);
+        y = arr_get(db, i);
+        si (op == "add") { pila_push(data_out, x + y); }
+        si (op == "sub") { pila_push(data_out, x - y); }
+        si (op == "mul") { pila_push(data_out, x * y); }
+        si (op == "div") { pila_push(data_out, x / y); }
+    }
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(ta, "shape")], ["ndim", mapa_get(ta, "ndim")], ["data", data_out]]);
+}
+
+funcion np_add(a, b) { retornar _op_binaria(a, b, "add"); }
+funcion np_sub(a, b) { retornar _op_binaria(a, b, "sub"); }
+funcion np_mul(a, b) { retornar _op_binaria(a, b, "mul"); }
+funcion np_div(a, b) { retornar _op_binaria(a, b, "div"); }
+funcion np_scalar_mul(s, a) { retornar _op_binaria(s, a, "mul"); }
+
+// Matmul (solo 2D x 1D para el perceptron o 2D x 2D basico)
+funcion np_matmul(a, b) {
+    ta = np_array(a);
+    tb = np_array(b);
+    na = mapa_get(ta, "ndim");
+    nb = mapa_get(tb, "ndim");
+    da = mapa_get(ta, "data");
+    db = mapa_get(tb, "data");
+    sa = mapa_get(ta, "shape");
+    sb = mapa_get(tb, "shape");
+    
+    si (na == 1) {
+        si (nb == 1) {
+            // 1D x 1D (dot product)
+            acc = 0;
+            n = arr_get(sa, 0);
+            por (i = 0; i < n; i = i + 1) {
+                acc = acc + arr_get(da, i) * arr_get(db, i);
+            }
+            retornar crear_mapa([["__np__", true], ["shape", []], ["ndim", 0], ["data", [acc]]]);
+        }
+    }
+    
+    si (na == 2) {
+        si (nb == 1) {
+            // 2D x 1D
+            m = arr_get(sa, 0);
+            k = arr_get(sa, 1);
+            out = crear_pila();
+            por (i = 0; i < m; i = i + 1) {
+                acc = 0;
+                base = i * k;
+                por (p = 0; p < k; p = p + 1) {
+                    acc = acc + arr_get(da, base + p) * arr_get(db, p);
+                }
+                pila_push(out, acc);
+            }
+            retornar crear_mapa([["__np__", true], ["shape", [m]], ["ndim", 1], ["data", out]]);
+        }
+        si (nb == 2) {
+            // 2D x 2D
+            m = arr_get(sa, 0);
+            k = arr_get(sa, 1);
+            n = arr_get(sb, 1);
+            out = crear_pila();
+            por (i = 0; i < m; i = i + 1) {
+                por (j = 0; j < n; j = j + 1) {
+                    acc = 0;
+                    por (p = 0; p < k; p = p + 1) {
+                        acc = acc + arr_get(da, i * k + p) * arr_get(db, p * n + j);
+                    }
+                    pila_push(out, acc);
+                }
+            }
+            retornar crear_mapa([["__np__", true], ["shape", [m, n]], ["ndim", 2], ["data", out]]);
+        }
+    }
+    error("np_matmul: combinacion de dimensiones no soportada en PELE");
+}
+
+funcion np_sum(a, axis) {
+    t = np_array(a);
+    ndim = mapa_get(t, "ndim");
+    data = mapa_get(t, "data");
+    shape = mapa_get(t, "shape");
+    
+    si (axis == -1) {
+        acc = 0;
+        por (i = 0; i < longitud(data); i = i + 1) {
+            acc = acc + arr_get(data, i);
+        }
+        retornar crear_mapa([["__np__", true], ["shape", []], ["ndim", 0], ["data", [acc]]]);
+    }
+    
+    si (ndim == 2) {
+        rows = arr_get(shape, 0);
+        cols = arr_get(shape, 1);
+        si (axis == 0) {
+            out = crear_pila();
+            por (c = 0; c < cols; c = c + 1) {
+                pila_push(out, 0);
+            }
+            por (r = 0; r < rows; r = r + 1) {
+                base = r * cols;
+                por (c = 0; c < cols; c = c + 1) {
+                    arr_set(out, c, arr_get(out, c) + arr_get(data, base + c));
+                }
+            }
+            retornar crear_mapa([["__np__", true], ["shape", [cols]], ["ndim", 1], ["data", out]]);
+        }
+        si (axis == 1) {
+            out = crear_pila();
+            por (r = 0; r < rows; r = r + 1) {
+                base = r * cols;
+                acc = 0;
+                por (c = 0; c < cols; c = c + 1) {
+                    acc = acc + arr_get(data, base + c);
+                }
+                pila_push(out, acc);
+            }
+            retornar crear_mapa([["__np__", true], ["shape", [rows]], ["ndim", 1], ["data", out]]);
+        }
+    }
+    error("np_sum no soportado para este axis");
+}
+
+funcion np_argmax(a, axis) {
+    t = np_array(a);
+    ndim = mapa_get(t, "ndim");
+    data = mapa_get(t, "data");
+    shape = mapa_get(t, "shape");
+    
+    si (ndim == 1) {
+        best_i = 0;
+        best_v = arr_get(data, 0);
+        por (i = 1; i < longitud(data); i = i + 1) {
+            v = arr_get(data, i);
+            si (v > best_v) {
+                best_v = v;
+                best_i = i;
+            }
+        }
+        retornar crear_mapa([["__np__", true], ["shape", []], ["ndim", 0], ["data", [best_i]]]);
+    }
+    
+    si (ndim == 2) {
+        rows = arr_get(shape, 0);
+        cols = arr_get(shape, 1);
+        si (axis == 0) {
+            out = crear_pila();
+            por (c = 0; c < cols; c = c + 1) {
+                best_r = 0;
+                best_v = arr_get(data, c);
+                por (r = 1; r < rows; r = r + 1) {
+                    v = arr_get(data, r * cols + c);
+                    si (v > best_v) {
+                        best_v = v;
+                        best_r = r;
+                    }
+                }
+                pila_push(out, best_r);
+            }
+            retornar crear_mapa([["__np__", true], ["shape", [cols]], ["ndim", 1], ["data", out]]);
+        }
+        si (axis == 1) {
+            out = crear_pila();
+            por (r = 0; r < rows; r = r + 1) {
+                base = r * cols;
+                best_c = 0;
+                best_v = arr_get(data, base);
+                por (c = 1; c < cols; c = c + 1) {
+                    v = arr_get(data, base + c);
+                    si (v > best_v) {
+                        best_v = v;
+                        best_c = c;
+                    }
+                }
+                pila_push(out, best_c);
+            }
+            retornar crear_mapa([["__np__", true], ["shape", [rows]], ["ndim", 1], ["data", out]]);
+        }
+    }
+    error("np_argmax no soportado");
+}
+
+// --- PROGRAMACION FUNCIONAL EN PELE ---
+funcion map(f, arr) {
+    res = crear_pila();
+    por (i = 0; i < longitud(arr); i = i + 1) {
+        pila_push(res, f(arr_get(arr, i)));
+    }
+    retornar res;
+}
+
+funcion filter(f, arr) {
+    res = crear_pila();
+    por (i = 0; i < longitud(arr); i = i + 1) {
+        v = arr_get(arr, i);
+        si (f(v)) {
+            pila_push(res, v);
+        }
+    }
+    retornar res;
+}
+
+funcion reduce(f, arr, initial) {
+    acc = initial;
+    por (i = 0; i < longitud(arr); i = i + 1) {
+        acc = f(acc, arr_get(arr, i));
+    }
+    retornar acc;
+}
+
+// --- MATEMATICAS Y GRAFICOS EN PELE ---
+funcion np_item(t) {
+    retornar arr_get(mapa_get(t, "data"), 0);
+}
+
+funcion np_pi() {
+    retornar 3.141592653589793;
+}
+
+funcion _sin_scalar(x) {
+    PI = 3.141592653589793;
+    x = x % (2 * PI);
+    si (x > PI) { x = x - 2 * PI; }
+    term = x;
+    suma = x;
+    por (i = 1; i < 10; i = i + 1) {
+        term = term * (-1) * x * x / ((2 * i) * (2 * i + 1));
+        suma = suma + term;
+    }
+    retornar suma;
+}
+
+funcion _cos_scalar(x) {
+    PI = 3.141592653589793;
+    x = x % (2 * PI);
+    si (x > PI) { x = x - 2 * PI; }
+    term = 1.0;
+    suma = 1.0;
+    por (i = 1; i < 10; i = i + 1) {
+        term = term * (-1) * x * x / ((2 * i - 1) * (2 * i));
+        suma = suma + term;
+    }
+    retornar suma;
+}
+
+funcion np_sin(t) {
+    data = mapa_get(t, "data");
+    out = map("_sin_scalar", data);
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}
+
+funcion np_cos(t) {
+    data = mapa_get(t, "data");
+    out = map("_cos_scalar", data);
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}
+
+funcion np_linspace(start, stop, num) {
+    num = entero(num);
+    si (num <= 1) {
+        retornar crear_mapa([["__np__", true], ["shape", [1]], ["ndim", 1], ["data", [start]]]);
+    }
+    step = (stop - start) / (num - 1);
+    out = crear_pila();
+    por (i = 0; i < num; i = i + 1) {
+        pila_push(out, start + i * step);
+    }
+    retornar crear_mapa([["__np__", true], ["shape", [num]], ["ndim", 1], ["data", out]]);
+}
+
+funcion np_plot(tx, y, filename) {
+    // Validar Y como lista de tensores
+    y_tensors = crear_pila();
+    si (es_mapa(y)) {
+        pila_push(y_tensors, y);
+    } sino {
+        por (i = 0; i < longitud(y); i = i + 1) {
+            pila_push(y_tensors, arr_get(y, i));
+        }
+    }
+    
+    // Buscar minimos y maximos
+    min_x = arr_get(mapa_get(tx, "data"), 0);
+    max_x = min_x;
+    data_x = mapa_get(tx, "data");
+    por (i = 0; i < longitud(data_x); i = i + 1) {
+        vx = arr_get(data_x, i);
+        si (vx < min_x) { min_x = vx; }
+        si (vx > max_x) { max_x = vx; }
+    }
+    
+    min_y = 999999999.0;
+    max_y = -999999999.0;
+    por (i = 0; i < longitud(y_tensors); i = i + 1) {
+        ty = arr_get(y_tensors, i);
+        data_y = mapa_get(ty, "data");
+        por (j = 0; j < longitud(data_y); j = j + 1) {
+            vy = arr_get(data_y, j);
+            si (vy < min_y) { min_y = vy; }
+            si (vy > max_y) { max_y = vy; }
+        }
+    }
+    
+    si (max_x == min_x) { max_x = min_x + 1; }
+    si (max_y == min_y) { max_y = min_y + 1; }
+    
+    width = 800;
+    height = 600;
+    padding = 50;
+    
+    // Generar string SVG
+    svg = "<svg width=\"" + a_texto(width) + "\" height=\"" + a_texto(height) + "\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+    svg = svg + "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n";
+    
+    // Ejes
+    y_zero = height - padding - (0 - min_y) / (max_y - min_y) * (height - 2 * padding);
+    si (min_y > 0) { y_zero = height - padding; }
+    si (max_y < 0) { y_zero = padding; }
+    
+    x_zero = padding + (0 - min_x) / (max_x - min_x) * (width - 2 * padding);
+    si (min_x > 0) { x_zero = padding; }
+    si (max_x < 0) { x_zero = width - padding; }
+    
+    svg = svg + "<line x1=\"" + a_texto(padding) + "\" y1=\"" + a_texto(y_zero) + "\" x2=\"" + a_texto(width-padding) + "\" y2=\"" + a_texto(y_zero) + "\" stroke=\"black\" stroke-width=\"2\"/>\n";
+    svg = svg + "<line x1=\"" + a_texto(x_zero) + "\" y1=\"" + a_texto(padding) + "\" x2=\"" + a_texto(x_zero) + "\" y2=\"" + a_texto(height-padding) + "\" stroke=\"black\" stroke-width=\"2\"/>\n";
+    
+    colors = ["blue", "red", "green", "purple", "orange", "brown"];
+    
+    por (i = 0; i < longitud(y_tensors); i = i + 1) {
+        ty = arr_get(y_tensors, i);
+        data_y = mapa_get(ty, "data");
+        color = arr_get(colors, i % longitud(colors));
+        
+        svg = svg + "<polyline points=\"";
+        por (j = 0; j < longitud(data_x); j = j + 1) {
+            vx = arr_get(data_x, j);
+            vy = arr_get(data_y, j);
+            cx = padding + (vx - min_x) / (max_x - min_x) * (width - 2 * padding);
+            cy = height - padding - (vy - min_y) / (max_y - min_y) * (height - 2 * padding);
+            svg = svg + a_texto(cx) + "," + a_texto(cy) + " ";
+        }
+        svg = svg + "\" fill=\"none\" stroke=\"" + color + "\" stroke-width=\"2\"/>\n";
+    }
+    
+    svg = svg + "</svg>";
+    escribir_archivo(filename, svg);
+    retornar 0;
+}

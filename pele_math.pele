@@ -1,0 +1,175 @@
+// pele_math.pele - Funciones Matematicas y Activaciones
+// Implementada 100% en PELE bajo el Paradigma Funcional
+// Sin dependencias externas. Usa series de Taylor, Newton-Raphson, etc.
+
+// ============================================================
+// CONSTANTES
+// ============================================================
+_E = 2.718281828459045;
+
+// ============================================================
+// FUNCIONES ALGEBRAICAS
+// ============================================================
+
+funcion pele_abs(x) {
+    si (x < 0) {
+        retornar -x;
+    }
+    retornar x;
+}
+
+funcion pele_sqrt(x) {
+    // Raiz cuadrada por Newton-Raphson (20 iteraciones)
+    si (x == 0) { retornar 0.0; }
+    guess = x / 2.0;
+    por (i = 0; i < 20; i = i + 1) {
+        guess = 0.5 * (guess + x / guess);
+    }
+    retornar guess;
+}
+
+// ============================================================
+// FUNCIONES TRASCENDENTALES
+// ============================================================
+
+funcion pele_exp(x) {
+    // e^x mediante Serie de Maclaurin: sum(x^k / k!) para k=0..29
+    // Para x < 0 usa la identidad e^x = 1 / e^(-x)
+    si (x < 0) {
+        retornar 1.0 / pele_exp(-x);
+    }
+    resultado = 1.0;
+    termino = 1.0;
+    por (i = 1; i < 30; i = i + 1) {
+        termino = termino * x / i;
+        resultado = resultado + termino;
+    }
+    retornar resultado;
+}
+
+funcion pele_log(x) {
+    // Logaritmo natural ln(x)
+    // Reduce argumento al intervalo [1/e, e] y aplica serie de Leibniz
+    // ln(x) = 2 * sum( (1/(2n+1)) * ((x-1)/(x+1))^(2n+1) )
+    E = 2.718281828459045;
+    exponente = 0.0;
+    mientras (x >= E) {
+        x = x / E;
+        exponente = exponente + 1.0;
+    }
+    inv_e = 1.0 / E;
+    mientras (x <= inv_e) {
+        x = x * E;
+        exponente = exponente - 1.0;
+    }
+    y = (x - 1.0) / (x + 1.0);
+    y2 = y * y;
+    resultado = 0.0;
+    termino = y;
+    por (n = 1; n < 100; n = n + 2) {
+        resultado = resultado + termino / n;
+        termino = termino * y2;
+    }
+    retornar 2.0 * resultado + exponente;
+}
+
+funcion pele_tan(x) {
+    // Tangente: sin(x) / cos(x)
+    retornar _sin_scalar(x) / _cos_scalar(x);
+}
+
+// ============================================================
+// FUNCIONES DE ACTIVACION (escalares)
+// ============================================================
+
+funcion pele_sigmoid(x) {
+    // Sigmoide numericamente estable
+    si (x >= 0) {
+        retornar 1.0 / (1.0 + pele_exp(-x));
+    }
+    ez = pele_exp(x);
+    retornar ez / (1.0 + ez);
+}
+
+funcion pele_relu(x) {
+    si (x > 0) { retornar x; }
+    retornar 0;
+}
+
+funcion pele_tanh(x) {
+    ep = pele_exp(x);
+    en = pele_exp(-x);
+    retornar (ep - en) / (ep + en);
+}
+
+funcion _max_array(arr) {
+    m = arr_get(arr, 0);
+    por (i = 1; i < longitud(arr); i = i + 1) {
+        v = arr_get(arr, i);
+        si (v > m) { m = v; }
+    }
+    retornar m;
+}
+
+funcion pele_softmax(v) {
+    // Softmax numericamente estable: resta el maximo antes de exp
+    m = _max_array(v);
+    exps = crear_pila();
+    suma = 0.0;
+    por (i = 0; i < longitud(v); i = i + 1) {
+        e = pele_exp(arr_get(v, i) - m);
+        pila_push(exps, e);
+        suma = suma + e;
+    }
+    resultado = crear_pila();
+    por (i = 0; i < longitud(exps); i = i + 1) {
+        pila_push(resultado, arr_get(exps, i) / suma);
+    }
+    retornar resultado;
+}
+
+// ============================================================
+// VERSIONES PARA TENSORES (element-wise sobre np_array)
+// ============================================================
+
+funcion np_exp(t) {
+    data = mapa_get(t, "data");
+    out = map("pele_exp", data);
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}
+
+funcion np_log(t) {
+    data = mapa_get(t, "data");
+    out = map("pele_log", data);
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}
+
+funcion np_sqrt(t) {
+    data = mapa_get(t, "data");
+    out = map("pele_sqrt", data);
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}
+
+funcion np_abs(t) {
+    data = mapa_get(t, "data");
+    out = map("pele_abs", data);
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}
+
+funcion np_sigmoid(t) {
+    data = mapa_get(t, "data");
+    out = map("pele_sigmoid", data);
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}
+
+funcion np_relu(t) {
+    data = mapa_get(t, "data");
+    out = map("pele_relu", data);
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}
+
+funcion np_tanh(t) {
+    data = mapa_get(t, "data");
+    out = map("pele_tanh", data);
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}

@@ -1,0 +1,18 @@
+
+let n = 6;
+let sen_vals = [];
+let cos_vals = [];
+
+let i = -6;
+while (i < n) {
+    let t = (i / (n*10)) * 2.0 * PI;
+    let sen_vals = append(sen_vals, sin(t));
+    let cos_vals = append(cos_vals, cos(t));
+    let i = i + 1;
+}
+
+Plotdoz.multi_curve([sen_vals, cos_vals], ["sen(x)", "cos(x)"],
+    "sen(x) vs cos(x) en [0, 2*PI]", "x", "y",
+    "out_seno_coseno.svg");
+
+mostrar("Grafica generada: out_seno_coseno.svg");

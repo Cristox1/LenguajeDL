@@ -1,0 +1,123 @@
+// pele_data.pele — Manejo de Datos
+// Implementada 100% en PELE bajo el Paradigma Funcional
+
+// Train/Test Split
+funcion train_test_split(X, y, ratio) {
+    n = longitud(X);
+    n_test = entero(n * ratio);
+    si (n_test < 1) { n_test = 1; }
+    n_train = n - n_test;
+    // Crear indices y mezclar
+    indices = crear_pila();
+    por (i = 0; i < n; i = i + 1) { pila_push(indices, i); }
+    indices = random_shuffle(indices);
+    // Separar
+    X_train = crear_pila(); y_train = crear_pila();
+    X_test = crear_pila(); y_test = crear_pila();
+    por (i = 0; i < n_train; i = i + 1) {
+        idx = arr_get(indices, i);
+        pila_push(X_train, arr_get(X, idx));
+        pila_push(y_train, arr_get(y, idx));
+    }
+    por (i = n_train; i < n; i = i + 1) {
+        idx = arr_get(indices, i);
+        pila_push(X_test, arr_get(X, idx));
+        pila_push(y_test, arr_get(y, idx));
+    }
+    retornar [X_train, y_train, X_test, y_test];
+}
+
+// Normalizacion min-max por columna
+funcion normalizar(X) {
+    n = longitud(X);
+    si (n == 0) { retornar [X, [], []]; }
+    primer = arr_get(X, 0);
+    si (no es_arreglo(primer)) {
+        // 1D
+        min_v = arr_get(X, 0); max_v = arr_get(X, 0);
+        por (i = 1; i < n; i = i + 1) {
+            v = arr_get(X, i);
+            si (v < min_v) { min_v = v; }
+            si (v > max_v) { max_v = v; }
+        }
+        out = crear_pila();
+        rango = max_v - min_v;
+        si (rango == 0) { rango = 1; }
+        por (i = 0; i < n; i = i + 1) {
+            pila_push(out, (arr_get(X, i) - min_v) / rango);
+        }
+        retornar [out, [min_v], [max_v]];
+    }
+    // 2D
+    ncols = longitud(primer);
+    mins = crear_pila(); maxs = crear_pila();
+    por (j = 0; j < ncols; j = j + 1) {
+        mn = arr_get(arr_get(X, 0), j); mx = mn;
+        por (i = 1; i < n; i = i + 1) {
+            v = arr_get(arr_get(X, i), j);
+            si (v < mn) { mn = v; }
+            si (v > mx) { mx = v; }
+        }
+        pila_push(mins, mn); pila_push(maxs, mx);
+    }
+    resultado = crear_pila();
+    por (i = 0; i < n; i = i + 1) {
+        fila = arr_get(X, i);
+        nueva_fila = crear_pila();
+        por (j = 0; j < ncols; j = j + 1) {
+            rango = arr_get(maxs, j) - arr_get(mins, j);
+            si (rango == 0) { rango = 1; }
+            pila_push(nueva_fila, (arr_get(fila, j) - arr_get(mins, j)) / rango);
+        }
+        pila_push(resultado, nueva_fila);
+    }
+    retornar [resultado, mins, maxs];
+}
+
+// Estandarizacion z-score
+funcion estandarizar(X) {
+    n = longitud(X);
+    si (n == 0) { retornar [X, [], []]; }
+    primer = arr_get(X, 0);
+    ncols = longitud(primer);
+    medias = crear_pila(); stds = crear_pila();
+    por (j = 0; j < ncols; j = j + 1) {
+        suma = 0;
+        por (i = 0; i < n; i = i + 1) { suma = suma + arr_get(arr_get(X, i), j); }
+        media = suma / n;
+        pila_push(medias, media);
+        sum_sq = 0;
+        por (i = 0; i < n; i = i + 1) {
+            d = arr_get(arr_get(X, i), j) - media;
+            sum_sq = sum_sq + d * d;
+        }
+        std = pele_sqrt(sum_sq / n);
+        si (std == 0) { std = 1; }
+        pila_push(stds, std);
+    }
+    resultado = crear_pila();
+    por (i = 0; i < n; i = i + 1) {
+        fila = arr_get(X, i);
+        nueva_fila = crear_pila();
+        por (j = 0; j < ncols; j = j + 1) {
+            pila_push(nueva_fila, (arr_get(fila, j) - arr_get(medias, j)) / arr_get(stds, j));
+        }
+        pila_push(resultado, nueva_fila);
+    }
+    retornar [resultado, medias, stds];
+}
+
+// Mezclar X e y juntos
+funcion mezclar_datos(X, y) {
+    n = longitud(X);
+    indices = crear_pila();
+    por (i = 0; i < n; i = i + 1) { pila_push(indices, i); }
+    indices = random_shuffle(indices);
+    X_nuevo = crear_pila(); y_nuevo = crear_pila();
+    por (i = 0; i < n; i = i + 1) {
+        idx = arr_get(indices, i);
+        pila_push(X_nuevo, arr_get(X, idx));
+        pila_push(y_nuevo, arr_get(y, idx));
+    }
+    retornar [X_nuevo, y_nuevo];
+}

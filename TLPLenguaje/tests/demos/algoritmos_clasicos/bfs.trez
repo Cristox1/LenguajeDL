@@ -1,0 +1,70 @@
+// BFS — Breadth-First Search (Grokking AI Algorithms, Cap 2)
+// Grafo como diccionario nodo -> lista de vecinos
+// Explora nivel por nivel usando Queue (FIFO)
+
+func get_neighbors(graph, node) {
+    if (graph.has(node)) { return graph[node]; }
+    return [];
+}
+
+func build_path(parent, node) {
+    let path = [node];
+    let current = node;
+    while (parent.has(current)) {
+        let current = parent[current];
+        let path = [current] + path;
+    }
+    return path;
+}
+
+func run_bfs(graph, start, goal) {
+    let q       = Queue();
+    let q       = q.enqueue(start);
+    let visited = {};
+    let visited = visited.set(start, true);
+    let parent  = {};
+
+    while (not q.isEmpty()) {
+        let r       = q.dequeue();
+        let current = r[0];
+        let q       = r[1];
+
+        if (current == goal) {
+            return build_path(parent, current);
+        }
+
+        let neighbors = get_neighbors(graph, current);
+        for neighbor in neighbors {
+            if (not visited.has(neighbor)) {
+                let visited = visited.set(neighbor, true);
+                let parent  = parent.set(neighbor, current);
+                let q       = q.enqueue(neighbor);
+            }
+        }
+    }
+    return "No path to goal";
+}
+
+// Grafo simple: A conecta a B y C, B y C conectan a D
+let g = {};
+let g = g.set("A", ["B", "C"]);
+let g = g.set("B", ["D"]);
+let g = g.set("C", ["D"]);
+let g = g.set("D", []);
+
+mostrar(run_bfs(g, "A", "D"));   // ["A", "B", "D"]
+mostrar(run_bfs(g, "A", "X"));   // "No path to goal"
+
+// Grafo mas complejo (road trip del libro)
+let grafo = {};
+let grafo = grafo.set("start",     ["pit1", "act1"]);
+let grafo = grafo.set("pit1",      ["pit2", "act1"]);
+let grafo = grafo.set("pit2",      ["pit3", "sleep1"]);
+let grafo = grafo.set("pit3",      ["beach"]);
+let grafo = grafo.set("act1",      ["sleep1", "act2"]);
+let grafo = grafo.set("act2",      ["sleep1"]);
+let grafo = grafo.set("sleep1",    ["pit3", "beach"]);
+let grafo = grafo.set("beach",     []);
+
+let camino = run_bfs(grafo, "start", "beach");
+mostrar(camino);

@@ -1,0 +1,73 @@
+// demo_kmeans.trez — K-Means Clustering (no supervisado)
+// Dataset: blobs (sklearn) — 3 grupos sinteticos en 2D
+// Algoritmo: Mldoz.kmeans_fit (Lloyd, convergencia por centroides)
+
+Randomdoz.seed(42);
+
+let datos = Datadoz.read_csv("../tests/demos/ml_sklearn/datasets/blobs.csv");
+let n = Datadoz.num_filas(datos);
+mostrar("Filas dataset blobs:");
+mostrar(n);
+
+let col_x1  = Datadoz.columna(datos, "x1");
+let col_x2  = Datadoz.columna(datos, "x2");
+let col_lab = Datadoz.columna(datos, "label");
+
+let X = [];
+let Y_real = [];
+let i = 0;
+while (i < n) {
+    let X = append(X, [col_x1[i], col_x2[i]]);
+    let Y_real = append(Y_real, int(col_lab[i]));
+    let i = i + 1;
+}
+
+// k-Means no usa etiquetas — aprendizaje no supervisado
+let modelo = Mldoz.kmeans_fit(X, 3, 100);
+mostrar("Centroides descubiertos:");
+mostrar(modelo["centroides"]);
+
+// Asignar clusters
+let labels = Mldoz.kmeans_predict(modelo, X);
+
+// Conteo por cluster
+let c0 = 0; let c1 = 0; let c2 = 0;
+let j = 0;
+while (j < n) {
+    if      (labels[j] == 0) { let c0 = c0 + 1; }
+    else if (labels[j] == 1) { let c1 = c1 + 1; }
+    else                     { let c2 = c2 + 1; }
+    let j = j + 1;
+}
+mostrar("Puntos por cluster [0, 1, 2]:");
+mostrar([c0, c1, c2]);
+
+// Extraer coordenadas para graficar
+let xs = [];
+let ys = [];
+let k = 0;
+while (k < n) {
+    let xs = append(xs, X[k][0]);
+    let ys = append(ys, X[k][1]);
+    let k = k + 1;
+}
+
+// Graficas
+Plotdoz.scatter_classes(xs, ys, labels,
+    ["Cluster 0", "Cluster 1", "Cluster 2"],
+    "k-Means — Grupos descubiertos (Blobs)",
+    "x1", "x2",
+    "../tests/demos/ml_sklearn/resultados/out_kmeans_pred.svg");
+
+Plotdoz.scatter_classes(xs, ys, Y_real,
+    ["Real 0", "Real 1", "Real 2"],
+    "k-Means — Etiquetas reales (Blobs)",
+    "x1", "x2",
+    "../tests/demos/ml_sklearn/resultados/out_kmeans_real.svg");
+
+Plotdoz.bar_chart(["Cluster 0", "Cluster 1", "Cluster 2"],
+    [c0, c1, c2],
+    "k-Means — Tamano de cada cluster", "Cluster", "Puntos",
+    "../tests/demos/ml_sklearn/resultados/out_kmeans_bars.svg");
+
+mostrar("=== k-Means OK ===");

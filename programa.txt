@@ -1,123 +1,179 @@
-mostrar("=== ALGORITMO 1: EUCLIDES (MCD) ===");
-funcion euclides(a, b) {
-    mientras (b != 0) {
-        residuo = a % b;
-        a = b;
-        b = residuo;
-    }
-    retornar a;
-}
+// ============================================================
+// PROGRAMA DE PRUEBAS COMPLETO DE PELE
+// ============================================================
 
-resultado_mcd = euclides(48, 18);
-mostrar("El MCD de 48 y 18 es (debe ser 6):");
-mostrar(resultado_mcd);
+// === TEST 1: OPERADORES LOGICOS ===
+mostrar("=== TEST 1: OPERADORES LOGICOS ===");
+mostrar(true && true);
+mostrar(true && false);
+mostrar(false || true);
+mostrar(false || false);
+mostrar(no true);
+mostrar(no false);
 mostrar(" ");
 
+// === TEST 2: ACCESO POR INDICE [] ===
+mostrar("=== TEST 2: ACCESO POR INDICE ===");
+nums = [10, 20, 30, 40, 50];
+mostrar(nums[0]);
+mostrar(nums[2]);
+mostrar(nums[4]);
+mat = [[1, 2], [3, 4]];
+mostrar(mat[0][1]);
+mostrar(mat[1][0]);
+mostrar(" ");
 
-mostrar("=== ALGORITMO 2: SERIE DE TAYLOR (Aproximacion de e^x) ===");
-// Funcion auxiliar necesaria para la formula de Taylor
-funcion factorial(n) {
-    si (n <= 1) {
-        retornar 1;
+// === TEST 3: DICCIONARIOS LITERALES ===
+mostrar("=== TEST 3: DICCIONARIOS LITERALES ===");
+persona = {nombre: "PELE", version: 2, funcional: true};
+mostrar(persona["nombre"]);
+mostrar(persona["version"]);
+mostrar(" ");
+
+// === TEST 4: LAMBDAS ===
+mostrar("=== TEST 4: LAMBDAS ===");
+doble = \x -> x * 2;
+mostrar(doble(5));
+mostrar(doble(21));
+mostrar(" ");
+
+// === TEST 5: PIPE OPERATOR |> ===
+mostrar("=== TEST 5: PIPE OPERATOR ===");
+resultado = 5 |> doble;
+mostrar(resultado);
+mostrar(" ");
+
+// === TEST 6: ELSE-IF ENCADENADO ===
+mostrar("=== TEST 6: ELSE-IF ENCADENADO ===");
+funcion clasificar(x) {
+    si (x > 0) {
+        retornar "positivo";
+    } sino si (x < 0) {
+        retornar "negativo";
+    } sino {
+        retornar "cero";
     }
+}
+mostrar(clasificar(5));
+mostrar(clasificar(-3));
+mostrar(clasificar(0));
+mostrar(" ");
+
+// === TEST 7: METODOS CON DOT NOTATION ===
+mostrar("=== TEST 7: DOT NOTATION ===");
+lista = [1, 2, 3, 4, 5];
+mostrar(lista.len());
+mostrar(lista.head());
+mostrar(lista.reverse());
+mostrar(lista.contains(3));
+mostrar(lista.append(6));
+mostrar(" ");
+
+// === TEST 8: BUILTINS FUNCIONALES ===
+mostrar("=== TEST 8: BUILTINS ===");
+mostrar(head([10, 20, 30]));
+mostrar(tail([10, 20, 30]));
+mostrar(append([1, 2], 3));
+mostrar(range(5));
+mostrar(" ");
+
+// === TEST 9: FOR SOBRE STRING ===
+mostrar("=== TEST 9: FOR STRING ===");
+for (c in "PELE") {
+    mostrar(c);
+}
+mostrar(" ");
+
+// === TEST 10: ARITMETICA VECTORIAL ===
+mostrar("=== TEST 10: VECTORES ===");
+a = [1, 2, 3];
+b = [4, 5, 6];
+mostrar(a + b);
+mostrar(b - a);
+mostrar(2 * a);
+mostrar(" ");
+
+// === TEST 11: REGRESION LINEAL ===
+mostrar("=== TEST 11: REGRESION LINEAL ===");
+X_lr = [[1.0, 1.0], [1.0, 2.0], [2.0, 2.0], [2.0, 3.0], [3.0, 3.0]];
+y_lr = [6.0, 9.0, 11.0, 14.0, 16.0];
+modelo_lr = linreg_fit(X_lr, y_lr, 0.005, 2000);
+pred_lr = linreg_predict(modelo_lr, X_lr);
+mostrar("Predicciones LR:");
+mostrar(pred_lr);
+mostrar("R2:");
+mostrar(r2_score(y_lr, pred_lr));
+mostrar(" ");
+
+// === TEST 12: KNN ===
+mostrar("=== TEST 12: KNN ===");
+X_knn = [[1.0, 1.0], [1.5, 1.5], [2.0, 1.0], [8.0, 8.0], [8.5, 8.5], [9.0, 8.0]];
+y_knn = [0, 0, 0, 1, 1, 1];
+knn_modelo = knn_fit(X_knn, y_knn, 3);
+// Predict one by one
+mostrar("KNN single:");
+mostrar(knn_predict(knn_modelo, [1.2, 1.3]));
+mostrar(knn_predict(knn_modelo, [8.3, 8.2]));
+mostrar(" ");
+
+// === TEST 13: K-MEANS ===
+mostrar("=== TEST 13: K-MEANS ===");
+random_seed(42);
+X_km = [[0.1, 0.2], [0.3, 0.1], [0.2, 0.3], [10.1, 10.2], [9.9, 9.9], [10.2, 10.3]];
+km_modelo = kmeans_fit(X_km, 2, 50);
+asigns = mapa_get(km_modelo, "asignaciones");
+mostrar("Asignaciones:");
+mostrar(asigns);
+mostrar(asigns[0] == asigns[1]);
+mostrar(asigns[0] != asigns[3]);
+mostrar(" ");
+
+// === TEST 14: METRICAS ===
+mostrar("=== TEST 14: METRICAS ===");
+y_real = [1, 0, 1, 1, 0, 1, 0, 0];
+y_pred_m = [1, 0, 1, 0, 0, 1, 1, 0];
+mostrar("Accuracy:");
+mostrar(accuracy(y_real, y_pred_m));
+mostrar("Precision (clase 1):");
+mostrar(precision(y_real, y_pred_m, 1));
+mostrar("Recall (clase 1):");
+mostrar(recall(y_real, y_pred_m, 1));
+mostrar("F1:");
+mostrar(f1_score(y_real, y_pred_m, 1));
+mostrar(" ");
+
+// === TEST 15: PERCEPTRON (AND) ===
+mostrar("=== TEST 15: PERCEPTRON AND ===");
+X_and = [
+    np_array([0, 0, 1]),
+    np_array([0, 1, 1]),
+    np_array([1, 0, 1]),
+    np_array([1, 1, 1])
+];
+Y_and = [0, 0, 0, 1];
+pesos_and = fit_perceptron(X_and, Y_and, 0.5, 200);
+pred_and = predecir_lote(pesos_and, X_and);
+mostrar("Predicciones AND:");
+mostrar(pred_and);
+mostrar("Accuracy AND:");
+mostrar(accuracy(Y_and, pred_and));
+mostrar(" ");
+
+// === TEST 16: FUNCIONES RECURSIVAS ===
+mostrar("=== TEST 16: RECURSION ===");
+funcion factorial(n) {
+    si (n <= 1) { retornar 1; }
     retornar n * factorial(n - 1);
 }
+mostrar(factorial(5));
+mostrar(factorial(10));
 
-funcion exponencial_taylor(x, n) {
-    suma = 0;
-    por (i = 0; i <= n; i = i + 1) {
-        // termino = (x^i) / i!
-        termino = (x ** i) / factorial(i);
-        suma = suma + termino;
-    }
-    retornar suma;
+funcion fibonacci(n) {
+    si (n <= 0) { retornar 0; }
+    si (n == 1) { retornar 1; }
+    retornar fibonacci(n - 1) + fibonacci(n - 2);
 }
-
-// Vamos a aproximar e^2 (que es aprox 7.389) usando 10 iteraciones
-resultado_taylor = exponencial_taylor(2, 10);
-mostrar("Aproximacion de e^2 con 10 iteraciones:");
-mostrar(resultado_taylor);
+mostrar(fibonacci(10));
 mostrar(" ");
 
-
-mostrar("=== ALGORITMO 3: ORDENAMIENTO BURBUJA ===");
-// Pasamos 'n' como parametro ya que no tenemos funcion longitud() aun.
-// Usamos arr_get y arr_set que ya existen en los builtins de tu Visitor.
-funcion burbuja(lista, n) {
-    por (i = 0; i < n - 1; i = i + 1) {
-        // En PELE, el limite es n - i - 1 para evitar desbordar el arreglo
-        limite = n - i - 1;
-        por (j = 0; j < limite; j = j + 1) {
-            // Obtenemos lista[j] y lista[j+1]
-            actual = arr_get(lista, j);
-            siguiente = arr_get(lista, j + 1);
-
-            // Si lista[j] > lista[j + 1] -> intercambiar
-            si (actual > siguiente) {
-                arr_set(lista, j, siguiente);
-                arr_set(lista, j + 1, actual);
-            }
-
-            // Mostrar el estado de la lista en cada comparación/intercambio
-            mostrar(lista);
-        }
-    }
-    retornar lista;
-}
-
-mi_lista = [64, 34, 25, 12, 22, 11, 90];
-mostrar("Lista original:");
-mostrar(mi_lista);
-
-// La lista tiene 7 elementos
-lista_ordenada = burbuja(mi_lista, 7);
-
-mostrar("Lista ordenada por burbuja:");
-mostrar(lista_ordenada);
-mostrar(" ");
-
-mostrar("=== ALGORITMO 4: MINI-NUMPY ===");
-A = np_array([[1, 2, 3], [4, 5, 6]]);
-B = np_array([[7, 8], [9, 10], [11, 12]]);
-v = np_array([1, 2, 3]);
-w = np_array([4, 5, 6]);
-
-mostrar("shape(A):");
-mostrar(np_shape(A));
-mostrar("A @ B:");
-mostrar(np_matmul(A, B));
-mostrar("v · w:");
-mostrar(np_matmul(v, w));
-mostrar("A @ v:");
-mostrar(np_matmul(A, v));
-mostrar("sum(A, -1):");
-mostrar(np_sum(A, -1));
-mostrar("sum(A, 0):");
-mostrar(np_sum(A, 0));
-mostrar("sum(A, 1):");
-mostrar(np_sum(A, 1));
-mostrar("argmax(v, 0):");
-mostrar(np_argmax(v, 0));
-mostrar("argmax(A, 0):");
-mostrar(np_argmax(A, 0));
-mostrar("argmax(A, 1):");
-mostrar(np_argmax(A, 1));
-mostrar("A + 1:");
-mostrar(np_add(A, 1));
-mostrar("A * ones([2,3]):");
-mostrar(np_mul(A, np_ones([2, 3])));
-mostrar("zeros([2,2]):");
-mostrar(np_zeros([2, 2]));
-mostrar(" ");
-
-mostrar("=== ALGORITMO 5: MINI-NUMPY RNG ===");
-np_seed(123);
-a = np_rand([2, 3]);
-np_seed(123);
-b = np_rand([2, 3]);
-mostrar("a:");
-mostrar(a);
-mostrar("b:");
-mostrar(b);
-mostrar("Uniforme [-1,1) shape [3]:");
-mostrar(np_uniform(-1, 1, [3]));
+mostrar("=== TODAS LAS PRUEBAS COMPLETADAS ===");

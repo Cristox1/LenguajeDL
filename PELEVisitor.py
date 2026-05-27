@@ -84,6 +84,106 @@ class PELEVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by PELEParser#PostfixExpr.
+    def visitPostfixExpr(self, ctx:PELEParser.PostfixExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#AndExpr.
+    def visitAndExpr(self, ctx:PELEParser.AndExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#PowerExpr.
+    def visitPowerExpr(self, ctx:PELEParser.PowerExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#MulDivModExpr.
+    def visitMulDivModExpr(self, ctx:PELEParser.MulDivModExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#EqExpr.
+    def visitEqExpr(self, ctx:PELEParser.EqExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#PipeExpr.
+    def visitPipeExpr(self, ctx:PELEParser.PipeExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#NotExpr.
+    def visitNotExpr(self, ctx:PELEParser.NotExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#RelationalExpr.
+    def visitRelationalExpr(self, ctx:PELEParser.RelationalExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#AddSubExpr.
+    def visitAddSubExpr(self, ctx:PELEParser.AddSubExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#OrExpr.
+    def visitOrExpr(self, ctx:PELEParser.OrExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#UnaryMinusExpr.
+    def visitUnaryMinusExpr(self, ctx:PELEParser.UnaryMinusExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#AtomExpr.
+    def visitAtomExpr(self, ctx:PELEParser.AtomExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#IndexExpr.
+    def visitIndexExpr(self, ctx:PELEParser.IndexExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#MethodCallExpr.
+    def visitMethodCallExpr(self, ctx:PELEParser.MethodCallExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#ParensExpr.
+    def visitParensExpr(self, ctx:PELEParser.ParensExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#FuncCallExpr.
+    def visitFuncCallExpr(self, ctx:PELEParser.FuncCallExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#ArrayExpr.
+    def visitArrayExpr(self, ctx:PELEParser.ArrayExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#EmptyDictExpr.
+    def visitEmptyDictExpr(self, ctx:PELEParser.EmptyDictExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#DictLiteralExpr.
+    def visitDictLiteralExpr(self, ctx:PELEParser.DictLiteralExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#LambdaExpr.
+    def visitLambdaExpr(self, ctx:PELEParser.LambdaExprContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by PELEParser#BoolExpr.
     def visitBoolExpr(self, ctx:PELEParser.BoolExprContext):
         return self.visitChildren(ctx)
@@ -91,6 +191,11 @@ class PELEVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by PELEParser#StringExpr.
     def visitStringExpr(self, ctx:PELEParser.StringExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PELEParser#IntExpr.
+    def visitIntExpr(self, ctx:PELEParser.IntExprContext):
         return self.visitChildren(ctx)
 
 
@@ -104,48 +209,8 @@ class PELEVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by PELEParser#RelationalExpr.
-    def visitRelationalExpr(self, ctx:PELEParser.RelationalExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by PELEParser#PowerExpr.
-    def visitPowerExpr(self, ctx:PELEParser.PowerExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by PELEParser#ArrayExpr.
-    def visitArrayExpr(self, ctx:PELEParser.ArrayExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by PELEParser#MulDivModExpr.
-    def visitMulDivModExpr(self, ctx:PELEParser.MulDivModExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by PELEParser#ParensExpr.
-    def visitParensExpr(self, ctx:PELEParser.ParensExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by PELEParser#IntExpr.
-    def visitIntExpr(self, ctx:PELEParser.IntExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by PELEParser#AddSubExpr.
-    def visitAddSubExpr(self, ctx:PELEParser.AddSubExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by PELEParser#UnaryMinusExpr.
-    def visitUnaryMinusExpr(self, ctx:PELEParser.UnaryMinusExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by PELEParser#FuncCallExpr.
-    def visitFuncCallExpr(self, ctx:PELEParser.FuncCallExprContext):
+    # Visit a parse tree produced by PELEParser#dictEntry.
+    def visitDictEntry(self, ctx:PELEParser.DictEntryContext):
         return self.visitChildren(ctx)
 
 

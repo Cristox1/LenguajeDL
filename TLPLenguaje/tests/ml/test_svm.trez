@@ -1,0 +1,25 @@
+// test_svm.trez — SVM lineal sobre datos linealmente separables
+// Clase 0: nube alrededor de (1,1), Clase 1: nube alrededor de (6,6)
+
+let X = [
+    [0.8, 1.2], [1.1, 0.9], [1.3, 1.4], [0.9, 0.8], [1.0, 1.1],
+    [6.2, 5.8], [5.9, 6.1], [6.4, 6.3], [5.8, 5.9], [6.1, 6.2]
+];
+let y = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1];
+
+let modelo = Mldoz.svm_fit(X, y, 0.05, 500, 0.01);
+
+// La pérdida debe haber bajado
+let h = modelo["historia"];
+mostrar(h[0] > h[len(h) - 1]);   // true
+
+// Predicciones sobre los mismos puntos
+let yp = Mldoz.svm_predict(modelo, X);
+mostrar(yp);
+
+// Accuracy perfecta sobre datos separables
+mostrar(Metricsdoz.accuracy(y, yp));   // 1.0
+
+// Puntos nuevos
+mostrar(Mldoz.svm_predict(modelo, [1.0, 1.0]));   // 0
+mostrar(Mldoz.svm_predict(modelo, [6.0, 6.0]));   // 1

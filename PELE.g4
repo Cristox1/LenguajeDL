@@ -3,7 +3,7 @@ grammar PELE;
 // LÉXICOS
 TRUE    : 'true' ;
 FALSE   : 'false' ;
-STRING  : '"' ~["]* '"' ;
+STRING  : '"' ( '\\' . | ~["\\] )* '"' ;
 
 SI      : 'si' ;
 SINO    : 'sino' ;
@@ -14,6 +14,25 @@ FOR     : 'for' ;
 IN      : 'in' ;
 FUNCION : 'funcion' ;
 RETORNAR: 'retornar' ;
+NOT     : 'no' ;
+
+// Operadores multi-caracter (deben ir antes de los simples)
+PIPE    : '|>' ;
+AND     : '&&' ;
+OR      : '||' ;
+ARROW   : '->' ;
+POW     : '**' ;
+EQEQ    : '==' ;
+NEQ     : '!=' ;
+LE      : '<=' ;
+GE      : '>=' ;
+
+// Operadores simples
+LT      : '<' ;
+GT      : '>' ;
+BACKSLASH : '\\' ;
+DOT     : '.' ;
+COLON   : ':' ;
 
 // Identificador y números
 ID      : [a-zA-Z_][a-zA-Z0-9_]* ;
@@ -44,7 +63,7 @@ statement
     ;
 
 ifStatement
-    : SI '(' expr ')' '{' block '}' ( SINO '{' block '}' )?
+    : SI '(' expr ')' '{' block '}' ( SINO ifStatement | SINO '{' block '}' )?
     ;
 
 functionDecl
@@ -59,19 +78,43 @@ assignment
     : ID '=' expr
     ;
 
+// Expresiones — de menor a mayor precedencia
 expr
-    : '-' expr                                # UnaryMinusExpr
-    | expr '**' expr                          # PowerExpr
-    | expr ('*' | '/' | '%') expr             # MulDivModExpr
-    | expr ('+' | '-') expr                   # AddSubExpr
-    | expr ('<' | '<=' | '>' | '>=' | '==' | '!=') expr   # RelationalExpr
-    | '[' (expr (',' expr)*)? ']'             # ArrayExpr
-    | TRUE                                    # BoolExpr
-    | FALSE                                   # BoolExpr
-    | STRING                                  # StringExpr
-    | INT                                     # IntExpr
-    | FLOAT                                   # FloatExpr
-    | ID '(' (expr (',' expr)*)? ')'          # FuncCallExpr
-    | ID                                      # IdExpr
-    | '(' expr ')'                            # ParensExpr
+    : expr PIPE expr                               # PipeExpr
+    | expr OR expr                                 # OrExpr
+    | expr AND expr                                # AndExpr
+    | NOT expr                                     # NotExpr
+    | expr (EQEQ | NEQ) expr                       # EqExpr
+    | expr (LT | LE | GT | GE) expr                # RelationalExpr
+    | expr ('+' | '-') expr                        # AddSubExpr
+    | expr ('*' | '/' | '%') expr                  # MulDivModExpr
+    | expr POW expr                                # PowerExpr
+    | '-' expr                                     # UnaryMinusExpr
+    | postfix                                      # PostfixExpr
+    ;
+
+// Postfix — acceso por índice y llamadas a métodos
+postfix
+    : postfix '[' expr ']'                                     # IndexExpr
+    | postfix DOT ID '(' (expr (',' expr)*)? ')'              # MethodCallExpr
+    | atom                                                     # AtomExpr
+    ;
+
+atom
+    : '(' expr ')'                                 # ParensExpr
+    | ID '(' (expr (',' expr)*)? ')'               # FuncCallExpr
+    | '[' (expr (',' expr)*)? ']'                  # ArrayExpr
+    | '{' '}'                                      # EmptyDictExpr
+    | '{' dictEntry (',' dictEntry)* '}'           # DictLiteralExpr
+    | BACKSLASH ID ARROW expr                      # LambdaExpr
+    | TRUE                                         # BoolExpr
+    | FALSE                                        # BoolExpr
+    | STRING                                       # StringExpr
+    | INT                                          # IntExpr
+    | FLOAT                                        # FloatExpr
+    | ID                                           # IdExpr
+    ;
+
+dictEntry
+    : (STRING | ID) COLON expr
     ;

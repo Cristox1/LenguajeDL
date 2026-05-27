@@ -1,0 +1,41 @@
+// test_kmeans.trez — k-Means sobre 3 nubes sintéticas bien separadas
+
+Randomdoz.seed(42);
+
+// Nube 0: alrededor de (0, 0)
+// Nube 1: alrededor de (10, 0)
+// Nube 2: alrededor de (5, 9)
+let X = [
+    [0.1, 0.2], [0.3, -0.1], [-0.2, 0.3], [0.0, 0.1], [0.2, -0.2],
+    [10.1, 0.2], [9.9, -0.1], [10.2, 0.3], [10.0, 0.0], [9.8, 0.1],
+    [5.1, 9.2], [4.9, 8.9], [5.2, 9.1], [5.0, 9.0], [4.8, 8.8]
+];
+
+let modelo = Mldoz.kmeans_fit(X, 3, 100);
+
+// 15 puntos asignados a 3 clusters
+let asigns = modelo["asignaciones"];
+mostrar(len(asigns));       // 15
+
+// Los 5 primeros deben ser el mismo cluster
+mostrar(asigns[0] == asigns[1]);   // true
+mostrar(asigns[0] == asigns[2]);   // true
+mostrar(asigns[0] == asigns[3]);   // true
+mostrar(asigns[0] == asigns[4]);   // true
+
+// Los 5 del medio deben ser un cluster distinto al de los primeros
+mostrar(asigns[5] == asigns[6]);   // true
+mostrar(asigns[5] != asigns[0]);   // true
+
+// Los 5 últimos forman su propio cluster
+mostrar(asigns[10] == asigns[11]);  // true
+mostrar(asigns[10] != asigns[0]);   // true
+mostrar(asigns[10] != asigns[5]);   // true
+
+// Predecir nuevos puntos
+let nuevos = [[0.0, 0.0], [10.0, 0.0], [5.0, 9.0]];
+let pred = Mldoz.kmeans_predict(modelo, nuevos);
+// Los 3 deben pertenecer a clusters distintos entre sí
+mostrar(pred[0] != pred[1]);   // true
+mostrar(pred[0] != pred[2]);   // true
+mostrar(pred[1] != pred[2]);   // true

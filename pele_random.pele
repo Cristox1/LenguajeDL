@@ -1,0 +1,77 @@
+// pele_random.pele — RNG mejorado con Xorshift
+// Implementada 100% en PELE bajo el Paradigma Funcional
+
+// Estado interno del RNG (Xorshift simplificado via LCG)
+_rng_state = [1];
+
+funcion random_seed(s) {
+    arr_set(_rng_state, 0, entero(s));
+    retornar 0;
+}
+
+funcion _random_next() {
+    estado = arr_get(_rng_state, 0);
+    nuevo = (1664525 * estado + 1013904223) % 4294967296;
+    arr_set(_rng_state, 0, nuevo);
+    retornar nuevo / 4294967296.0;
+}
+
+funcion random_float() {
+    retornar _random_next();
+}
+
+funcion random_uniform(a, b) {
+    retornar a + (b - a) * _random_next();
+}
+
+funcion random_randint(a, b) {
+    retornar entero(a + _random_next() * (b - a + 1));
+}
+
+funcion random_choice(arr) {
+    si (longitud(arr) == 0) { error("random_choice: lista vacia"); }
+    idx = entero(_random_next() * longitud(arr));
+    si (idx >= longitud(arr)) { idx = longitud(arr) - 1; }
+    retornar arr_get(arr, idx);
+}
+
+funcion random_sample(arr, k) {
+    n = longitud(arr);
+    si (k > n) { error("random_sample: k > longitud de lista"); }
+    pool = crear_pila();
+    por (i = 0; i < n; i = i + 1) { pila_push(pool, arr_get(arr, i)); }
+    por (i = 0; i < k; i = i + 1) {
+        j = i + entero(_random_next() * (n - i));
+        si (j >= n) { j = n - 1; }
+        tmp = arr_get(pool, i);
+        arr_set(pool, i, arr_get(pool, j));
+        arr_set(pool, j, tmp);
+    }
+    resultado = crear_pila();
+    por (i = 0; i < k; i = i + 1) { pila_push(resultado, arr_get(pool, i)); }
+    retornar resultado;
+}
+
+funcion random_shuffle(arr) {
+    n = longitud(arr);
+    copia = crear_pila();
+    por (i = 0; i < n; i = i + 1) { pila_push(copia, arr_get(arr, i)); }
+    por (i = n - 1; i > 0; i = i - 1) {
+        j = entero(_random_next() * (i + 1));
+        si (j > i) { j = i; }
+        tmp = arr_get(copia, i);
+        arr_set(copia, i, arr_get(copia, j));
+        arr_set(copia, j, tmp);
+    }
+    retornar copia;
+}
+
+funcion random_gauss(mu, sigma) {
+    // Box-Muller transform
+    PI = 3.141592653589793;
+    u1 = _random_next();
+    si (u1 < 0.0000000001) { u1 = 0.0000000001; }
+    u2 = _random_next();
+    z = pele_sqrt(-2.0 * pele_log(u1)) * _cos_scalar(2.0 * PI * u2);
+    retornar mu + sigma * z;
+}

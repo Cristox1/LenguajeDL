@@ -1,0 +1,21 @@
+[Plotdoz] learning_curve guardado en: ../tests/out_learning_curve.svg
+../tests/out_learning_curve.svg
+[Plotdoz] learning_curve guardado en: ../tests/out_train_only.svg
+../tests/out_train_only.svg
+[Plotdoz] multi_curve guardado en: ../tests/out_multi_curve.svg
+../tests/out_multi_curve.svg
+[Plotdoz] histogram guardado en: ../tests/out_histogram.svg
+../tests/out_histogram.svg
+[Plotdoz] bar_chart guardado en: ../tests/out_bar.svg
+../tests/out_bar.svg
+[Plotdoz] scatter guardado en: ../tests/out_scatter.svg
+../tests/out_scatter.svg
+[Plotdoz] scatter_classes guardado en: ../tests/out_scatter_classes.svg
+../tests/out_scatter_classes.svg
+[Plotdoz] line_chart guardado en: ../tests/out_line.svg
+../tests/out_line.svg
+[Plotdoz] confusion_matrix guardado en: ../tests/out_confusion.svg
+../tests/out_confusion.svg
+[Plotdoz] heatmap guardado en: ../tests/out_heatmap.svg
+../tests/out_heatmap.svg
+Todas las graficas generadas exitosamente.

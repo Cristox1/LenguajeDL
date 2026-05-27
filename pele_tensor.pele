@@ -1,0 +1,121 @@
+// pele_tensor.pele — Operaciones avanzadas de tensor
+// Implementada 100% en PELE bajo el Paradigma Funcional
+
+// Transponer matriz 2D
+funcion np_transpose(t) {
+    t = np_array(t);
+    ndim = mapa_get(t, "ndim");
+    si (ndim != 2) { error("np_transpose: solo soporta tensores 2D"); }
+    shape = mapa_get(t, "shape");
+    data = mapa_get(t, "data");
+    rows = arr_get(shape, 0);
+    cols = arr_get(shape, 1);
+    out = crear_pila();
+    por (c = 0; c < cols; c = c + 1) {
+        por (r = 0; r < rows; r = r + 1) {
+            pila_push(out, arr_get(data, r * cols + c));
+        }
+    }
+    retornar crear_mapa([["__np__", true], ["shape", [cols, rows]], ["ndim", 2], ["data", out]]);
+}
+
+// Aplanar tensor a 1D
+funcion np_flatten(t) {
+    t = np_array(t);
+    data = mapa_get(t, "data");
+    retornar crear_mapa([["__np__", true], ["shape", [longitud(data)]], ["ndim", 1], ["data", data]]);
+}
+
+// Reshape
+funcion np_reshape(t, nueva_shape) {
+    t = np_array(t);
+    data = mapa_get(t, "data");
+    retornar crear_mapa([["__np__", true], ["shape", nueva_shape], ["ndim", longitud(nueva_shape)], ["data", data]]);
+}
+
+// Concatenar dos tensores 1D
+funcion np_concat(a, b) {
+    ta = np_array(a);
+    tb = np_array(b);
+    da = mapa_get(ta, "data");
+    db = mapa_get(tb, "data");
+    out = crear_pila();
+    por (i = 0; i < longitud(da); i = i + 1) { pila_push(out, arr_get(da, i)); }
+    por (i = 0; i < longitud(db); i = i + 1) { pila_push(out, arr_get(db, i)); }
+    retornar crear_mapa([["__np__", true], ["shape", [longitud(out)]], ["ndim", 1], ["data", out]]);
+}
+
+// Matriz identidad
+funcion np_eye(n) {
+    n = entero(n);
+    out = crear_pila();
+    por (i = 0; i < n; i = i + 1) {
+        por (j = 0; j < n; j = j + 1) {
+            si (i == j) { pila_push(out, 1.0); } sino { pila_push(out, 0.0); }
+        }
+    }
+    retornar crear_mapa([["__np__", true], ["shape", [n, n]], ["ndim", 2], ["data", out]]);
+}
+
+// Media por eje
+funcion np_mean(a, axis) {
+    t = np_array(a);
+    s = np_sum(t, axis);
+    shape = mapa_get(t, "shape");
+    si (axis == -1) {
+        total = 1;
+        por (i = 0; i < longitud(shape); i = i + 1) { total = total * arr_get(shape, i); }
+        retornar np_div(s, total);
+    }
+    n = arr_get(shape, axis);
+    retornar np_div(s, n);
+}
+
+// Max de un tensor 1D
+funcion np_max_val(t) {
+    t = np_array(t);
+    data = mapa_get(t, "data");
+    m = arr_get(data, 0);
+    por (i = 1; i < longitud(data); i = i + 1) {
+        v = arr_get(data, i);
+        si (v > m) { m = v; }
+    }
+    retornar m;
+}
+
+// Min de un tensor 1D
+funcion np_min_val(t) {
+    t = np_array(t);
+    data = mapa_get(t, "data");
+    m = arr_get(data, 0);
+    por (i = 1; i < longitud(data); i = i + 1) {
+        v = arr_get(data, i);
+        si (v < m) { m = v; }
+    }
+    retornar m;
+}
+
+// Clip: limitar valores entre min y max
+funcion np_clip(t, min_v, max_v) {
+    t = np_array(t);
+    data = mapa_get(t, "data");
+    out = crear_pila();
+    por (i = 0; i < longitud(data); i = i + 1) {
+        v = arr_get(data, i);
+        si (v < min_v) { v = min_v; }
+        si (v > max_v) { v = max_v; }
+        pila_push(out, v);
+    }
+    retornar crear_mapa([["__np__", true], ["shape", mapa_get(t, "shape")], ["ndim", mapa_get(t, "ndim")], ["data", out]]);
+}
+
+// Arange: crea tensor [start, start+step, ..., stop)
+funcion np_arange(start, stop, step) {
+    out = crear_pila();
+    v = start;
+    mientras (v < stop) {
+        pila_push(out, v);
+        v = v + step;
+    }
+    retornar crear_mapa([["__np__", true], ["shape", [longitud(out)]], ["ndim", 1], ["data", out]]);
+}

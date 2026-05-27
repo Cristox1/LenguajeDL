@@ -1,0 +1,38 @@
+// test_metricsdoz_clf.trez — métricas de clasificación y regresión nuevas
+
+// ── Clasificación binaria construida a mano ──────────────────────────────
+// y_true: [1, 0, 1, 1, 0, 1, 0, 0]
+// y_pred: [1, 0, 1, 0, 0, 1, 1, 0]
+//   TP=3 (idx 0,2,5), TN=3 (idx 1,4,7), FP=1 (idx 6), FN=1 (idx 3)
+let y_true = [1, 0, 1, 1, 0, 1, 0, 0];
+let y_pred = [1, 0, 1, 0, 0, 1, 1, 0];
+
+mostrar(Metricsdoz.accuracy(y_true, y_pred));     // 0.75
+mostrar(Metricsdoz.precision(y_true, y_pred, 1)); // 0.75
+mostrar(Metricsdoz.recall(y_true, y_pred, 1));    // 0.75
+mostrar(Metricsdoz.f1_score(y_true, y_pred, 1));  // 0.75
+
+// ── Matriz de confusión binaria ──────────────────────────────────────────
+let conf = Metricsdoz.confusion_matrix(y_true, y_pred);
+mostrar(conf["matriz"]);    // [[3,1],[1,3]]
+mostrar(conf["clases"]);    // [0,1]
+
+// ── Multiclase 3 clases ──────────────────────────────────────────────────
+let yt3 = [0, 1, 2, 0, 1, 2, 0, 1, 2];
+let yp3 = [0, 2, 2, 0, 1, 1, 0, 1, 2];
+let conf3 = Metricsdoz.confusion_matrix(yt3, yp3);
+mostrar(conf3["matriz"]);
+mostrar(Metricsdoz.accuracy(yt3, yp3));           // 7/9
+
+// ── Regresión ────────────────────────────────────────────────────────────
+let y_real = [1.0, 2.0, 3.0, 4.0, 5.0];
+let y_est  = [1.1, 1.9, 3.2, 3.8, 5.1];
+
+mostrar(Metricsdoz.rmse(y_real, y_est));
+mostrar(Metricsdoz.mae(y_real, y_est));
+mostrar(Metricsdoz.r2_score(y_real, y_est) > 0.99);  // True
+
+// ── Predicción perfecta ──────────────────────────────────────────────────
+mostrar(Metricsdoz.accuracy([1, 2, 3], [1, 2, 3])); // 1.0
+mostrar(Metricsdoz.r2_score([1.0, 2.0, 3.0], [1.0, 2.0, 3.0])); // 1.0
+mostrar(Metricsdoz.rmse([1.0, 2.0, 3.0], [1.0, 2.0, 3.0]));     // 0.0

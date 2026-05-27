@@ -143,6 +143,186 @@ class PELEListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by PELEParser#PostfixExpr.
+    def enterPostfixExpr(self, ctx:PELEParser.PostfixExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#PostfixExpr.
+    def exitPostfixExpr(self, ctx:PELEParser.PostfixExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#AndExpr.
+    def enterAndExpr(self, ctx:PELEParser.AndExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#AndExpr.
+    def exitAndExpr(self, ctx:PELEParser.AndExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#PowerExpr.
+    def enterPowerExpr(self, ctx:PELEParser.PowerExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#PowerExpr.
+    def exitPowerExpr(self, ctx:PELEParser.PowerExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#MulDivModExpr.
+    def enterMulDivModExpr(self, ctx:PELEParser.MulDivModExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#MulDivModExpr.
+    def exitMulDivModExpr(self, ctx:PELEParser.MulDivModExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#EqExpr.
+    def enterEqExpr(self, ctx:PELEParser.EqExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#EqExpr.
+    def exitEqExpr(self, ctx:PELEParser.EqExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#PipeExpr.
+    def enterPipeExpr(self, ctx:PELEParser.PipeExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#PipeExpr.
+    def exitPipeExpr(self, ctx:PELEParser.PipeExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#NotExpr.
+    def enterNotExpr(self, ctx:PELEParser.NotExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#NotExpr.
+    def exitNotExpr(self, ctx:PELEParser.NotExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#RelationalExpr.
+    def enterRelationalExpr(self, ctx:PELEParser.RelationalExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#RelationalExpr.
+    def exitRelationalExpr(self, ctx:PELEParser.RelationalExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#AddSubExpr.
+    def enterAddSubExpr(self, ctx:PELEParser.AddSubExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#AddSubExpr.
+    def exitAddSubExpr(self, ctx:PELEParser.AddSubExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#OrExpr.
+    def enterOrExpr(self, ctx:PELEParser.OrExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#OrExpr.
+    def exitOrExpr(self, ctx:PELEParser.OrExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#UnaryMinusExpr.
+    def enterUnaryMinusExpr(self, ctx:PELEParser.UnaryMinusExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#UnaryMinusExpr.
+    def exitUnaryMinusExpr(self, ctx:PELEParser.UnaryMinusExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#AtomExpr.
+    def enterAtomExpr(self, ctx:PELEParser.AtomExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#AtomExpr.
+    def exitAtomExpr(self, ctx:PELEParser.AtomExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#IndexExpr.
+    def enterIndexExpr(self, ctx:PELEParser.IndexExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#IndexExpr.
+    def exitIndexExpr(self, ctx:PELEParser.IndexExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#MethodCallExpr.
+    def enterMethodCallExpr(self, ctx:PELEParser.MethodCallExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#MethodCallExpr.
+    def exitMethodCallExpr(self, ctx:PELEParser.MethodCallExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#ParensExpr.
+    def enterParensExpr(self, ctx:PELEParser.ParensExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#ParensExpr.
+    def exitParensExpr(self, ctx:PELEParser.ParensExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#FuncCallExpr.
+    def enterFuncCallExpr(self, ctx:PELEParser.FuncCallExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#FuncCallExpr.
+    def exitFuncCallExpr(self, ctx:PELEParser.FuncCallExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#ArrayExpr.
+    def enterArrayExpr(self, ctx:PELEParser.ArrayExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#ArrayExpr.
+    def exitArrayExpr(self, ctx:PELEParser.ArrayExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#EmptyDictExpr.
+    def enterEmptyDictExpr(self, ctx:PELEParser.EmptyDictExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#EmptyDictExpr.
+    def exitEmptyDictExpr(self, ctx:PELEParser.EmptyDictExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#DictLiteralExpr.
+    def enterDictLiteralExpr(self, ctx:PELEParser.DictLiteralExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#DictLiteralExpr.
+    def exitDictLiteralExpr(self, ctx:PELEParser.DictLiteralExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#LambdaExpr.
+    def enterLambdaExpr(self, ctx:PELEParser.LambdaExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#LambdaExpr.
+    def exitLambdaExpr(self, ctx:PELEParser.LambdaExprContext):
+        pass
+
+
     # Enter a parse tree produced by PELEParser#BoolExpr.
     def enterBoolExpr(self, ctx:PELEParser.BoolExprContext):
         pass
@@ -158,6 +338,15 @@ class PELEListener(ParseTreeListener):
 
     # Exit a parse tree produced by PELEParser#StringExpr.
     def exitStringExpr(self, ctx:PELEParser.StringExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PELEParser#IntExpr.
+    def enterIntExpr(self, ctx:PELEParser.IntExprContext):
+        pass
+
+    # Exit a parse tree produced by PELEParser#IntExpr.
+    def exitIntExpr(self, ctx:PELEParser.IntExprContext):
         pass
 
 
@@ -179,84 +368,12 @@ class PELEListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PELEParser#RelationalExpr.
-    def enterRelationalExpr(self, ctx:PELEParser.RelationalExprContext):
+    # Enter a parse tree produced by PELEParser#dictEntry.
+    def enterDictEntry(self, ctx:PELEParser.DictEntryContext):
         pass
 
-    # Exit a parse tree produced by PELEParser#RelationalExpr.
-    def exitRelationalExpr(self, ctx:PELEParser.RelationalExprContext):
-        pass
-
-
-    # Enter a parse tree produced by PELEParser#PowerExpr.
-    def enterPowerExpr(self, ctx:PELEParser.PowerExprContext):
-        pass
-
-    # Exit a parse tree produced by PELEParser#PowerExpr.
-    def exitPowerExpr(self, ctx:PELEParser.PowerExprContext):
-        pass
-
-
-    # Enter a parse tree produced by PELEParser#ArrayExpr.
-    def enterArrayExpr(self, ctx:PELEParser.ArrayExprContext):
-        pass
-
-    # Exit a parse tree produced by PELEParser#ArrayExpr.
-    def exitArrayExpr(self, ctx:PELEParser.ArrayExprContext):
-        pass
-
-
-    # Enter a parse tree produced by PELEParser#MulDivModExpr.
-    def enterMulDivModExpr(self, ctx:PELEParser.MulDivModExprContext):
-        pass
-
-    # Exit a parse tree produced by PELEParser#MulDivModExpr.
-    def exitMulDivModExpr(self, ctx:PELEParser.MulDivModExprContext):
-        pass
-
-
-    # Enter a parse tree produced by PELEParser#ParensExpr.
-    def enterParensExpr(self, ctx:PELEParser.ParensExprContext):
-        pass
-
-    # Exit a parse tree produced by PELEParser#ParensExpr.
-    def exitParensExpr(self, ctx:PELEParser.ParensExprContext):
-        pass
-
-
-    # Enter a parse tree produced by PELEParser#IntExpr.
-    def enterIntExpr(self, ctx:PELEParser.IntExprContext):
-        pass
-
-    # Exit a parse tree produced by PELEParser#IntExpr.
-    def exitIntExpr(self, ctx:PELEParser.IntExprContext):
-        pass
-
-
-    # Enter a parse tree produced by PELEParser#AddSubExpr.
-    def enterAddSubExpr(self, ctx:PELEParser.AddSubExprContext):
-        pass
-
-    # Exit a parse tree produced by PELEParser#AddSubExpr.
-    def exitAddSubExpr(self, ctx:PELEParser.AddSubExprContext):
-        pass
-
-
-    # Enter a parse tree produced by PELEParser#UnaryMinusExpr.
-    def enterUnaryMinusExpr(self, ctx:PELEParser.UnaryMinusExprContext):
-        pass
-
-    # Exit a parse tree produced by PELEParser#UnaryMinusExpr.
-    def exitUnaryMinusExpr(self, ctx:PELEParser.UnaryMinusExprContext):
-        pass
-
-
-    # Enter a parse tree produced by PELEParser#FuncCallExpr.
-    def enterFuncCallExpr(self, ctx:PELEParser.FuncCallExprContext):
-        pass
-
-    # Exit a parse tree produced by PELEParser#FuncCallExpr.
-    def exitFuncCallExpr(self, ctx:PELEParser.FuncCallExprContext):
+    # Exit a parse tree produced by PELEParser#dictEntry.
+    def exitDictEntry(self, ctx:PELEParser.DictEntryContext):
         pass
 
 

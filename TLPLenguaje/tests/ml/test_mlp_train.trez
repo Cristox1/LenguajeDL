@@ -1,0 +1,28 @@
+// test_mlp_train.trez — MLP entrenable resuelve XOR
+
+Randomdoz.seed(7);
+
+let X = [[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]];
+let y = [0.0, 1.0, 1.0, 0.0];
+
+// Arquitectura [2, 8, 1] — capa oculta con 8 neuronas
+let capas = NNdoz.mlp_init([2, 8, 1]);
+
+// Entrenar con MSE, 5000 épocas
+let resultado = NNdoz.mlp_train(capas, X, y, 0.05, 5000, "mse");
+
+let hist = resultado["historia"];
+
+// La pérdida inicial debe ser mayor que la final
+mostrar(hist[0] > hist[len(hist) - 1]);   // true
+
+// La pérdida final debe ser pequeña (< 0.05)
+let loss_final = hist[len(hist) - 1];
+mostrar(loss_final < 0.05);               // true
+
+// Predicciones: salidas cerca de 0 o 1
+let preds = NNdoz.mlp_predict(resultado["layers"], X);
+mostrar(preds[0][0] < 0.2);   // XOR(0,0) ≈ 0
+mostrar(preds[1][0] > 0.8);   // XOR(0,1) ≈ 1
+mostrar(preds[2][0] > 0.8);   // XOR(1,0) ≈ 1
+mostrar(preds[3][0] < 0.2);   // XOR(1,1) ≈ 0

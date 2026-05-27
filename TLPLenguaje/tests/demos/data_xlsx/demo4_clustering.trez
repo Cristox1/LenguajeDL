@@ -1,0 +1,81 @@
+// demo4_clustering.trez ─────────────────────────────────────────────────────
+// Aprendizaje NO supervisado: k-means + PCA para visualizar grupos
+// en el espacio socioeconómico.
+//
+// Dataset:  tests/data.xlsx
+// Features: edad, ingreso_mensual, anios_esc (3D)
+// Idea:     agrupar 400 personas en k=3 perfiles y proyectarlas a 2D vía PCA
+//           para poder dibujarlas.
+//
+// Pipeline:
+//   1. Leer xlsx, 400 filas
+//   2. Construir matriz X (3D escalada)
+//   3. Ajustar PCA (3 → 2)  con Preprocessdoz.pca_fit
+//   4. Mldoz.kmeans_fit con k=3
+//   5. Asignar cluster a cada punto y graficar con Plotdoz.scatter_classes
+// ────────────────────────────────────────────────────────────────────────────
+
+Randomdoz.seed(42);
+
+let raw   = Datadoz.read_xlsx("../tests/data.xlsx");
+let datos = raw.slice(0, 400);
+let n     = len(datos);
+
+let X = [];
+let i = 0;
+while (i < n) {
+    let fila = Datadoz.fila(datos, i);
+    let X = append(X, [
+        fila["edad"]            / 50.0,
+        fila["ingreso_mensual"] / 10000.0,
+        fila["anios_esc"]       / 12.0
+    ]);
+    let i = i + 1;
+}
+mostrar("Filas:");
+mostrar(n);
+
+// ── PCA 3D → 2D ─────────────────────────────────────────────────────────────
+let pca       = Preprocessdoz.pca_fit(X, 2);
+let X_2d      = Preprocessdoz.pca_transform(pca, X);
+let varianza  = Preprocessdoz.pca_explained_ratio(pca);
+mostrar("Varianza explicada por componente:");
+mostrar(varianza);
+
+// ── k-means k=3 sobre las 3 features originales ────────────────────────────
+let modelo  = Mldoz.kmeans_fit(X, 3, 100);
+let labels  = Mldoz.kmeans_predict(modelo, X);
+mostrar("Centroides aprendidos:");
+mostrar(modelo["centroides"]);
+
+// Extraer coordenadas del espacio PCA para el scatter por clase
+let xs = [];
+let ys = [];
+let k  = 0;
+while (k < n) {
+    let xs = append(xs, X_2d[k][0]);
+    let ys = append(ys, X_2d[k][1]);
+    let k  = k + 1;
+}
+
+// Visualizar clústeres en el espacio reducido
+Plotdoz.scatter_classes(xs, ys, labels,
+    ["cluster 0", "cluster 1", "cluster 2"],
+    "k-means sobre PCA(2)", "PC1", "PC2",
+    "../tests/out_demo4_clusters.svg");
+
+// Resumen rápido del tamaño de cada cluster
+let c0 = 0; let c1 = 0; let c2 = 0;
+let j = 0;
+while (j < len(labels)) {
+    if      (labels[j] == 0) { let c0 = c0 + 1; }
+    else if (labels[j] == 1) { let c1 = c1 + 1; }
+    else                     { let c2 = c2 + 1; }
+    let j = j + 1;
+}
+mostrar("Tamanos cluster 0 / 1 / 2:");
+mostrar(c0);
+mostrar(c1);
+mostrar(c2);
+
+mostrar("OK demo4");

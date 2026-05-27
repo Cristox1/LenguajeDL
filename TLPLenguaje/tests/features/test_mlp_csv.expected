@@ -1,0 +1,7 @@
+True
+True
+[Plotdoz] learning_curve guardado en: ../tests/out_mlp_csv_curve.svg
+../tests/out_mlp_csv_curve.svg
+[Plotdoz] confusion_matrix guardado en: ../tests/out_mlp_csv_confmat.svg
+../tests/out_mlp_csv_confmat.svg
+MLP CSV ok

@@ -1,0 +1,39 @@
+// test_randomdoz.trez — generador pseudoaleatorio nativo (Xorshift64)
+
+// ── Determinismo: misma semilla → misma secuencia ────────────────────────
+Randomdoz.seed(42);
+let a1 = Randomdoz.random();
+let a2 = Randomdoz.random();
+let a3 = Randomdoz.random();
+
+Randomdoz.seed(42);
+let b1 = Randomdoz.random();
+let b2 = Randomdoz.random();
+let b3 = Randomdoz.random();
+
+mostrar(a1 == b1);   // true
+mostrar(a2 == b2);   // true
+mostrar(a3 == b3);   // true
+
+// ── uniform y randint ────────────────────────────────────────────────────
+Randomdoz.seed(7);
+let u = Randomdoz.uniform(-1, 1);
+mostrar(u >= -1 && u < 1);   // true
+
+let r = Randomdoz.randint(1, 6);
+mostrar(r >= 1 && r <= 6);   // true
+
+// ── sample sin reemplazo ─────────────────────────────────────────────────
+Randomdoz.seed(7);
+let s = Randomdoz.sample([10, 20, 30, 40, 50], 3);
+mostrar(len(s) == 3);        // true
+
+// ── shuffle preserva los elementos ───────────────────────────────────────
+Randomdoz.seed(7);
+let sh = Randomdoz.shuffle([1, 2, 3, 4, 5]);
+mostrar(len(sh) == 5);       // true
+
+// ── gauss en torno a la media ────────────────────────────────────────────
+Randomdoz.seed(123);
+let g = Randomdoz.gauss(0, 1);
+mostrar(g);

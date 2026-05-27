@@ -1,0 +1,129 @@
+// pele_plot.pele — Graficos SVG Avanzados
+// Implementada 100% en PELE bajo el Paradigma Funcional
+
+// ============================================================
+// SCATTER PLOT
+// ============================================================
+funcion plot_scatter(x_data, y_data, filename) {
+    width = 800; height = 600; padding = 60;
+    min_x = arr_get(x_data, 0); max_x = min_x;
+    min_y = arr_get(y_data, 0); max_y = min_y;
+    n = longitud(x_data);
+    por (i = 1; i < n; i = i + 1) {
+        vx = arr_get(x_data, i); vy = arr_get(y_data, i);
+        si (vx < min_x) { min_x = vx; } si (vx > max_x) { max_x = vx; }
+        si (vy < min_y) { min_y = vy; } si (vy > max_y) { max_y = vy; }
+    }
+    si (max_x == min_x) { max_x = min_x + 1; }
+    si (max_y == min_y) { max_y = min_y + 1; }
+    svg = "<svg width=\"" + a_texto(width) + "\" height=\"" + a_texto(height) + "\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+    svg = svg + "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n";
+    // Ejes
+    svg = svg + "<line x1=\"" + a_texto(padding) + "\" y1=\"" + a_texto(height - padding) + "\" x2=\"" + a_texto(width - padding) + "\" y2=\"" + a_texto(height - padding) + "\" stroke=\"black\" stroke-width=\"2\"/>\n";
+    svg = svg + "<line x1=\"" + a_texto(padding) + "\" y1=\"" + a_texto(padding) + "\" x2=\"" + a_texto(padding) + "\" y2=\"" + a_texto(height - padding) + "\" stroke=\"black\" stroke-width=\"2\"/>\n";
+    // Puntos
+    por (i = 0; i < n; i = i + 1) {
+        cx = padding + (arr_get(x_data, i) - min_x) / (max_x - min_x) * (width - 2 * padding);
+        cy = height - padding - (arr_get(y_data, i) - min_y) / (max_y - min_y) * (height - 2 * padding);
+        svg = svg + "<circle cx=\"" + a_texto(cx) + "\" cy=\"" + a_texto(cy) + "\" r=\"4\" fill=\"steelblue\" opacity=\"0.7\"/>\n";
+    }
+    svg = svg + "</svg>";
+    escribir_archivo(filename, svg);
+    retornar 0;
+}
+
+// ============================================================
+// BAR CHART
+// ============================================================
+funcion plot_bar(labels, values, filename) {
+    width = 800; height = 500; padding = 60;
+    n = longitud(values);
+    max_v = arr_get(values, 0);
+    por (i = 1; i < n; i = i + 1) {
+        si (arr_get(values, i) > max_v) { max_v = arr_get(values, i); }
+    }
+    si (max_v == 0) { max_v = 1; }
+    bar_w = (width - 2 * padding) / n * 0.7;
+    gap = (width - 2 * padding) / n;
+    colors = ["#4285F4", "#EA4335", "#FBBC04", "#34A853", "#FF6D01", "#46BDC6"];
+    svg = "<svg width=\"" + a_texto(width) + "\" height=\"" + a_texto(height) + "\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+    svg = svg + "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n";
+    svg = svg + "<line x1=\"" + a_texto(padding) + "\" y1=\"" + a_texto(height - padding) + "\" x2=\"" + a_texto(width - padding) + "\" y2=\"" + a_texto(height - padding) + "\" stroke=\"black\" stroke-width=\"2\"/>\n";
+    por (i = 0; i < n; i = i + 1) {
+        h = arr_get(values, i) / max_v * (height - 2 * padding);
+        x = padding + i * gap + (gap - bar_w) / 2;
+        y = height - padding - h;
+        color = arr_get(colors, i % longitud(colors));
+        svg = svg + "<rect x=\"" + a_texto(x) + "\" y=\"" + a_texto(y) + "\" width=\"" + a_texto(bar_w) + "\" height=\"" + a_texto(h) + "\" fill=\"" + color + "\"/>\n";
+        // Label
+        lx = x + bar_w / 2;
+        svg = svg + "<text x=\"" + a_texto(lx) + "\" y=\"" + a_texto(height - padding + 20) + "\" text-anchor=\"middle\" font-size=\"12\">" + arr_get(labels, i) + "</text>\n";
+    }
+    svg = svg + "</svg>";
+    escribir_archivo(filename, svg);
+    retornar 0;
+}
+
+// ============================================================
+// LEARNING CURVE
+// ============================================================
+funcion plot_learning_curve(losses, filename) {
+    n = longitud(losses);
+    x_data = crear_pila();
+    por (i = 0; i < n; i = i + 1) { pila_push(x_data, i); }
+    width = 800; height = 500; padding = 60;
+    min_x = 0; max_x = n - 1;
+    si (max_x == 0) { max_x = 1; }
+    min_y = arr_get(losses, 0); max_y = min_y;
+    por (i = 1; i < n; i = i + 1) {
+        v = arr_get(losses, i);
+        si (v < min_y) { min_y = v; } si (v > max_y) { max_y = v; }
+    }
+    si (max_y == min_y) { max_y = min_y + 1; }
+    svg = "<svg width=\"" + a_texto(width) + "\" height=\"" + a_texto(height) + "\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+    svg = svg + "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n";
+    svg = svg + "<text x=\"" + a_texto(width / 2) + "\" y=\"30\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"bold\">Curva de Aprendizaje</text>\n";
+    // Ejes
+    svg = svg + "<line x1=\"" + a_texto(padding) + "\" y1=\"" + a_texto(height - padding) + "\" x2=\"" + a_texto(width - padding) + "\" y2=\"" + a_texto(height - padding) + "\" stroke=\"black\" stroke-width=\"2\"/>\n";
+    svg = svg + "<line x1=\"" + a_texto(padding) + "\" y1=\"" + a_texto(padding) + "\" x2=\"" + a_texto(padding) + "\" y2=\"" + a_texto(height - padding) + "\" stroke=\"black\" stroke-width=\"2\"/>\n";
+    // Linea
+    svg = svg + "<polyline points=\"";
+    por (i = 0; i < n; i = i + 1) {
+        cx = padding + i / max_x * (width - 2 * padding);
+        cy = height - padding - (arr_get(losses, i) - min_y) / (max_y - min_y) * (height - 2 * padding);
+        svg = svg + a_texto(cx) + "," + a_texto(cy) + " ";
+    }
+    svg = svg + "\" fill=\"none\" stroke=\"#EA4335\" stroke-width=\"2\"/>\n";
+    svg = svg + "</svg>";
+    escribir_archivo(filename, svg);
+    retornar 0;
+}
+
+// ============================================================
+// HISTOGRAM
+// ============================================================
+funcion plot_histogram(data, n_bins, filename) {
+    n = longitud(data);
+    min_v = arr_get(data, 0); max_v = min_v;
+    por (i = 1; i < n; i = i + 1) {
+        v = arr_get(data, i);
+        si (v < min_v) { min_v = v; } si (v > max_v) { max_v = v; }
+    }
+    si (max_v == min_v) { max_v = min_v + 1; }
+    bin_w = (max_v - min_v) / n_bins;
+    bins = crear_pila();
+    por (b = 0; b < n_bins; b = b + 1) { pila_push(bins, 0); }
+    por (i = 0; i < n; i = i + 1) {
+        v = arr_get(data, i);
+        idx = entero((v - min_v) / bin_w);
+        si (idx >= n_bins) { idx = n_bins - 1; }
+        arr_set(bins, idx, arr_get(bins, idx) + 1);
+    }
+    // Convertir a labels y values para bar chart
+    labels = crear_pila();
+    por (b = 0; b < n_bins; b = b + 1) {
+        pila_push(labels, a_texto(entero((min_v + b * bin_w) * 10) / 10));
+    }
+    plot_bar(labels, bins, filename);
+    retornar 0;
+}

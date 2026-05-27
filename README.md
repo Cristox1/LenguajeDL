@@ -6,7 +6,7 @@ El núcleo del lenguaje utiliza **ANTLR4** para el análisis léxico y sintácti
 
 ---
 
-## 🚀 Características y Capacidades de Deep Learning
+## Características y Capacidades de Deep Learning
 
 PELE cuenta con un ecosistema completo y autónomo de librerías para resolver problemas complejos de ciencia de datos:
 
@@ -39,17 +39,17 @@ PELE cuenta con un ecosistema completo y autónomo de librerías para resolver p
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 La arquitectura del lenguaje se divide en la infraestructura del intérprete y las librerías nativas:
 
-### ⚙️ Núcleo del Intérprete
+### Núcleo del Intérprete
 *   `PELE.g4`: Gramática formal en ANTLR4. Define la precedencia matemática correcta (desde acceso a índices hasta tuberías logicas) y la sintaxis.
 *   `visitorPELE.py`: Árbol de Sintaxis Abstracta (AST). Evaluador semántico puro libre de lógica de librerías.
 *   `pele.py`: Archivo ejecutable del compilador. Inyecta el preludio de librerías en orden de dependencia y corre el código.
 *   `programa.txt`: Suite integradora de pruebas y dashboard visual.
 
-### 📚 Librerías Nativas (`.pele`)
+### Librerías Nativas (`.pele`)
 *   `pele_math.pele`: Funciones matemáticas basales (potencia, exp, log, min, max, absoluto y funciones de activación como Sigmoide y ReLU).
 *   `pele_numpy.pele`: Abstracción de tensores multidimensionales y álgebra lineal.
 *   `pele_structs.pele`: Estructuras de datos puras (pilas, colas, conjuntos, árboles y grafos).
@@ -65,7 +65,7 @@ La arquitectura del lenguaje se divide en la infraestructura del intérprete y l
 
 ---
 
-## 🛠️ Requisitos Previos e Instalación
+## Requisitos Previos e Instalación
 
 1. **Entorno de Software:**
    * Python 3.x
@@ -94,7 +94,7 @@ La arquitectura del lenguaje se divide en la infraestructura del intérprete y l
 
 ---
 
-## 📝 Ejemplo de Flujo de ML Completo en PELE
+## Ejemplo de Flujo de ML Completo en PELE
 
 Puedes cargar un dataset CSV, limpiar características nulas, codificar variables cualitativas a binarias, entrenar un clasificador y evaluar métricas de precisión directamente en PELE:
 
@@ -123,7 +123,7 @@ mostrar(confusion_matrix(y_real, y_pred)); // Retorna [[3, 1], [1, 3]]
 
 ---
 
-## 📈 Historial de Avances
+## Historial de Avances
 
 *   **Fase 1 (Sintaxis Base):** Control de flujo (`si`, `mientras`, `por`), funciones, ámbitos de memoria (Scopes) y recursividad.
 *   **Fase 2 (Autonomía de Librerías):** Remoción absoluta de las dependencias externas del visitor. Todo el software estructurado (grafos, árboles, pilas) fue reescrito de forma nativa en PELE.

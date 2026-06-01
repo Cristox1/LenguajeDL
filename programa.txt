@@ -1,170 +1,171 @@
-// =====================================================================
-// PELE TEST RUNNER SUITE
-// Ejecuta y valida automáticamente todas las capacidades del lenguaje
-// =====================================================================
 
-mostrar("=================================================================");
-mostrar("                PELE SUITE RUNNER DASHBOARD                      ");
-mostrar("=================================================================");
+mostrar(" Clasificador de medicamentos");
 
-global_passed = 0;
-global_tests = 0;
+// 1. Cargar el dataset CSV
 
-runner_stats = [0, 0]; // [passed, total]
+mostrar("Cargando archivo 'drug200.csv'");
+csv_contenido = leer_archivo("drug200.csv");
+df = pd_read_csv(csv_contenido);
+mostrar(" => Dataset cargado con exito. Total filas: " + a_texto(longitud(df["data"])));
 
-funcion assert(nombre, condicion) {
-    arr_set(runner_stats, 1, runner_stats[1] + 1);
-    si (condicion) {
-        mostrar("  [PASS] " + nombre);
-        arr_set(runner_stats, 0, runner_stats[0] + 1);
-        retornar true;
-    } sino {
-        mostrar("  [FAIL] " + nombre);
-        retornar false;
+
+
+// 2. Preprocesamiento y Codificación One-Hot
+mostrar(" Preprocesando variables categoricas One Hot");
+df_proc = pd_one_hot_encode(df, "Sex");
+df_proc = pd_one_hot_encode(df_proc, "BP");
+df_proc = pd_one_hot_encode(df_proc, "Cholesterol");
+df_oh_target = pd_one_hot_encode(df_proc, "Drug");
+
+// Separar caracteristicas X (las primeras 9 columnas) y etiquetas y (las ultimas 5 columnas de droga)
+df_X = pd_select_columns(df_oh_target, ["Age", "Sex_F", "Sex_M", "BP_HIGH", "BP_LOW", "BP_NORMAL", "Cholesterol_HIGH", "Cholesterol_NORMAL", "Na_to_K"]);
+df_y = pd_select_columns(df_oh_target, ["Drug_DrugY", "Drug_drugC", "Drug_drugX", "Drug_drugA", "Drug_drugB"]);
+
+X_raw = pd_to_numpy(df_X);
+y_raw = pd_to_numpy(df_y);
+
+// Normalizar variables continuas de entrada (Age, Na_to_K y los one-hots) mediante Min-Max
+norm_res = normalizar(X_raw);
+X_norm = arr_get(norm_res, 0);
+mins = arr_get(norm_res, 1);
+maxs = arr_get(norm_res, 2);
+
+
+
+// 3. Inicializar y Entrenar el Perceptrón Multicapa
+mostrar(" Inicializando Perceptron Multicapa");
+mostrar("  -> Arquitectura: [9 entradas, 16 ocultas (ReLU), 5 salidas (MSE)]");
+random_seed(42);
+modelo_mlp = nn_mlp_init([9, 16, 5]);
+
+epocas = 100;
+lr = 0.05;
+mostrar("  -> Comenzando entrenamiento (" + a_texto(epocas) + " epocas, lr = " + a_texto(lr) + ")...");
+
+historia = nn_mlp_train(modelo_mlp, X_norm, y_raw, lr, epocas);
+
+mostrar("  -> Loss Inicial (Epoca 1):   " + a_texto(arr_get(historia, 0)));
+mostrar("  -> Loss Intermedio (Epoca 100): " + a_texto(arr_get(historia, 99)));
+mostrar("  -> Loss Intermedio (Epoca 200): " + a_texto(arr_get(historia, 199)));
+mostrar("  -> Loss Final (Epoca " + a_texto(epocas) + "):     " + a_texto(arr_get(historia, epocas - 1)));
+
+
+
+
+// 4. Calcular Precision de Entrenamiento Final
+mostrar("Calculando exactitud de entrenamiento ");
+preds = nn_mlp_predict(modelo_mlp, X_norm);
+aciertos = 0;
+total_preds = longitud(preds);
+
+por (i = 0; i < total_preds; i = i + 1) {
+    // Obtener argmax de la prediccion (clasificacion)
+    pred_i = arr_get(preds, i);
+    max_val = arr_get(pred_i, 0);
+    max_idx = 0;
+    por (j = 1; j < 5; j = j + 1) {
+        si (arr_get(pred_i, j) > max_val) {
+            max_val = arr_get(pred_i, j);
+            max_idx = j;
+        }
+    }
+    // Obtener argmax real de target
+    real_i = arr_get(y_raw, i);
+    real_idx = 0;
+    por (j = 0; j < 5; j = j + 1) {
+        si (arr_get(real_i, j) == 1) {
+            real_idx = j;
+        }
+    }
+    si (max_idx == real_idx) {
+        aciertos = aciertos + 1;
     }
 }
+precision = aciertos / total_preds;
+mostrar("  -> Precision de clasificacion final: " + a_texto(precision * 100) + "%");
 
-// -----------------------------------------------------------------
-// BLOQUE 1: CORE DEL LENGUAJE Y OPERADORES
-// -----------------------------------------------------------------
-mostrar("\n[BLOQUE 1] SINTAXIS Y OPERADORES CORE");
+// Guardar grafico SVG de la curva de aprendizaje
+plot_learning_curve(historia, "curva_aprendizaje_drogas.svg");
+mostrar("  -> [SVG] Grafica guardada en 'curva_aprendizaje_drogas.svg'");
 
-assert("Operadores logicos (&&, ||, no)", (true && true) && (false || true) && (no false));
 
-nums = [10, 20, 30, 40, 50];
-assert("Acceso por indice [] en listas", nums[0] == 10 && nums[2] == 30 && nums[4] == 50);
 
-persona = {nombre: "PELE", version: 2, funcional: true};
-assert("Diccionarios literales {} y acceso", persona["nombre"] == "PELE" && persona["version"] == 2 && persona["funcional"]);
 
-doble = \x -> x * 2;
-assert("Funciones anonimas (Lambdas)", doble(5) == 10 && doble(21) == 42);
 
-res_pipe = 5 |> doble;
-assert("Operador Pipeline (|>) con Lambdas", res_pipe == 10);
+// 5. Predicciones sobre Pacientes Nuevos
+mostrar(" Demostrando capacidad predictora con nuevos pacientes");
 
-funcion clasificar(x) {
-    si (x > 0) { retornar "pos"; }
-    sino si (x < 0) { retornar "neg"; }
-    sino { retornar "cero"; }
+funcion crear_vector_paciente(age, sex, bp, cholesterol, na_to_k) {
+    v = crear_pila();
+    pila_push(v, age);
+    
+    si (sex == "F") { pila_push(v, 1.0); pila_push(v, 0.0); }
+    sino { pila_push(v, 0.0); pila_push(v, 1.0); }
+    
+    si (bp == "HIGH") { pila_push(v, 1.0); pila_push(v, 0.0); pila_push(v, 0.0); }
+    sino si (bp == "LOW") { pila_push(v, 0.0); pila_push(v, 1.0); pila_push(v, 0.0); }
+    sino { pila_push(v, 0.0); pila_push(v, 0.0); pila_push(v, 1.0); }
+    
+    si (cholesterol == "HIGH") { pila_push(v, 1.0); pila_push(v, 0.0); }
+    sino { pila_push(v, 0.0); pila_push(v, 1.0); }
+    
+    pila_push(v, na_to_k);
+    retornar v;
 }
-assert("Estructura Condicional Else-If", clasificar(5) == "pos" && clasificar(-3) == "neg" && clasificar(0) == "cero");
 
-lista = [1, 2, 3, 4, 5];
-assert("Dot Notation en Listas (.len, .head, .contains)", lista.len() == 5 && lista.head() == 1 && lista.contains(3));
-
-assert("Primitivas Funcionales (head, tail, range)", head([1, 2]) == 1 && tail([1, 2])[0] == 2 && longitud(range(5)) == 5);
-
-cadena_for = "";
-for (c in "PELE") {
-    cadena_for = cadena_for + c;
+funcion normalizar_punto(x, mins, maxs) {
+    x_norm = crear_pila();
+    por (j = 0; j < longitud(x); j = j + 1) {
+        rango = arr_get(maxs, j) - arr_get(mins, j);
+        si (rango == 0) { rango = 1; }
+        pila_push(x_norm, (arr_get(x, j) - arr_get(mins, j)) / rango);
+    }
+    retornar x_norm;
 }
-assert("Ciclo For-In sobre strings", cadena_for == "PELE");
 
-va = [1, 2, 3];
-vb = [4, 5, 6];
-assert("Aritmetica vectorial nativa", (va + vb)[0] == 5 && (vb - va)[2] == 3 && (2 * va)[1] == 4);
-
-funcion factorial(n) {
-    si (n <= 1) { retornar 1; }
-    retornar n * factorial(n - 1);
+funcion predecir_droga_paciente(modelo, age, sex, bp, cholesterol, na_to_k, mins, maxs) {
+    v = crear_vector_paciente(age, sex, bp, cholesterol, na_to_k);
+    v_norm = normalizar_punto(v, mins, maxs);
+    
+    // Realizar paso forward
+    res_lote = nn_mlp_predict(modelo, [v_norm]);
+    pred_vec = arr_get(res_lote, 0);
+    
+    // Obtener la clase predicha con mayor probabilidad (argmax)
+    max_val = arr_get(pred_vec, 0);
+    max_idx = 0;
+    por (j = 1; j < 5; j = j + 1) {
+        si (arr_get(pred_vec, j) > max_val) {
+            max_val = arr_get(pred_vec, j);
+            max_idx = j;
+        }
+    }
+    
+    drogas = ["DrugY", "drugC", "drugX", "drugA", "drugB"];
+    retornar arr_get(drogas, max_idx);
 }
-assert("Recursividad (Factorial)", factorial(5) == 120);
 
-// -----------------------------------------------------------------
-// BLOQUE 2: ESTRUCTURAS DE DATOS NATIVAS (pele_structs.pele)
-// -----------------------------------------------------------------
-mostrar("\n[BLOQUE 2] ESTRUCTURAS DE DATOS (100% Nativas en PELE)");
+// Pruebas clinicas simuladas con datos extraidos
+mostrar("\n--- RESULTADOS DE LAS PREDICCIONES CLÍNICAS ---");
 
-p = pila_crear();
-p = pila_apilar(p, 10);
-p = pila_apilar(p, 20);
-p_tope = pila_tope(p);
-res_p = pila_desapilar(p);
-assert("Pilas (crear, apilar, tope, desapilar)", p_tope == 20 && res_p[0] == 20 && longitud(res_p[1]) == 1);
+d1 = predecir_droga_paciente(modelo_mlp, 23.0, "F", "HIGH", "HIGH", 25.355, mins, maxs);
+mostrar("Paciente 1 (Edad: 23, Sexo: F, BP: HIGH, Colesterol: HIGH, Na_to_K: 25.355)");
+mostrar("  -> Medicamento Recomendado: " + d1 + " (Esperado: DrugY)");
 
-c = cola_crear();
-c = cola_agregar(c, "A");
-c = cola_agregar(c, "B");
-res_c = cola_remover(c);
-assert("Colas (crear, agregar, remover)", res_c[0] == "A" && longitud(res_c[1]) == 1);
+d2 = predecir_droga_paciente(modelo_mlp, 47.0, "M", "LOW", "HIGH", 13.093, mins, maxs);
+mostrar("Paciente 2 (Edad: 47, Sexo: M, BP: LOW, Colesterol: HIGH, Na_to_K: 13.093)");
+mostrar("  -> Medicamento Recomendado: " + d2 + " (Esperado: drugC)");
 
-s = conjunto_crear();
-s = conjunto_agregar(s, 1);
-s = conjunto_agregar(s, 2);
-s = conjunto_agregar(s, 1);
-assert("Conjuntos (agregar sin duplicados y tiene)", longitud(s) == 2 && conjunto_tiene(s, 2) && no conjunto_tiene(s, 5));
+d3 = predecir_droga_paciente(modelo_mlp, 28.0, "F", "NORMAL", "HIGH", 7.798, mins, maxs);
+mostrar("Paciente 3 (Edad: 28, Sexo: F, BP: NORMAL, Colesterol: HIGH, Na_to_K: 7.798)");
+mostrar("  -> Medicamento Recomendado: " + d3 + " (Esperado: drugX)");
 
-raiz = arbol_crear(1);
-hijo1 = arbol_crear(2);
-raiz = arbol_agregar_hijo(raiz, hijo1);
-assert("Arboles (crear, agregar hijo y preorden)", arbol_preorden(raiz)[0] == 1 && arbol_preorden(raiz)[1] == 2);
+d4 = predecir_droga_paciente(modelo_mlp, 43.0, "M", "HIGH", "HIGH", 13.972, mins, maxs);
+mostrar("Paciente 4 (Edad: 43, Sexo: M, BP: HIGH, Colesterol: HIGH, Na_to_K: 13.972)");
+mostrar("  -> Medicamento Recomendado: " + d4 + " (Esperado: drugA)");
 
-g = grafo_crear();
-g = grafo_agregar_arista(g, "A", "B");
-g = grafo_agregar_arista(g, "A", "C");
-bfs_res = grafo_bfs_nativo(g, "A");
-dfs_res = grafo_dfs(g, "A");
-assert("Grafos (adyacencia, BFS y DFS recursivos)", bfs_res[1] == "B" && dfs_res[1] == "B");
+d5 = predecir_droga_paciente(modelo_mlp, 74.0, "M", "HIGH", "HIGH", 9.567, mins, maxs);
+mostrar("Paciente 5 (Edad: 74, Sexo: M, BP: HIGH, Colesterol: HIGH, Na_to_K: 9.567)");
+mostrar("  -> Medicamento Recomendado: " + d5 + " (Esperado: drugB)");
 
-// -----------------------------------------------------------------
-// BLOQUE 3: MACHINE LEARNING Y ESTADÍSTICA (pele_ml.pele)
-// -----------------------------------------------------------------
-mostrar("\n[BLOQUE 3] MACHINE LEARNING Y NUMPY NATIVOS");
-
-X_and = [np_array([0, 0, 1]), np_array([0, 1, 1]), np_array([1, 0, 1]), np_array([1, 1, 1])];
-Y_and = [0, 0, 0, 1];
-pesos_and = fit_perceptron(X_and, Y_and, 0.5, 200);
-pred_and = predecir_lote(pesos_and, X_and);
-assert("Perceptron (entrenamiento compuerta AND)", accuracy(Y_and, pred_and) == 1.0);
-
-X_lr = [[1.0, 1.0], [2.0, 1.0], [3.0, 2.0], [4.0, 3.0], [5.0, 5.0]];
-y_lr = [1.0, 2.0, 3.0, 4.0, 5.0];
-modelo_lr = linreg_fit(X_lr, y_lr, 0.005, 500);
-pred_lr = linreg_predict(modelo_lr, X_lr);
-assert("Regresion Lineal (ajuste por gradiente R2)", r2_score(y_lr, pred_lr) > 0.95);
-
-X_knn = [[1.0, 1.0], [1.5, 1.5], [8.0, 8.0], [8.5, 8.5]];
-y_knn = [0, 0, 1, 1];
-knn_mod = knn_fit(X_knn, y_knn, 3);
-assert("K-Nearest Neighbors (KNN clasificacion)", knn_predict(knn_mod, [1.2, 1.3]) == 0 && knn_predict(knn_mod, [8.3, 8.2]) == 1);
-
-random_seed(42);
-X_km = [[0.1, 0.2], [0.3, 0.1], [9.9, 9.9], [10.2, 10.3]];
-km_mod = kmeans_fit(X_km, 2, 50);
-asig = km_mod["asignaciones"];
-assert("K-Means Clustering (agrupacion espacial)", asig[0] == asig[1] && asig[0] != asig[2]);
-
-y_r = [1, 0, 1, 1, 0, 1, 0, 0];
-y_p = [1, 0, 1, 0, 0, 1, 1, 0];
-cm = confusion_matrix(y_r, y_p);
-assert("Metricas (Precision, Recall y Matriz de Confusion)", precision(y_r, y_p, 1) == 0.75 && recall(y_r, y_p, 1) == 0.75 && cm[0][0] == 3);
-
-// -----------------------------------------------------------------
-// BLOQUE 4: PANDAS Y PREPROCESAMIENTO (pele_pandas.pele)
-// -----------------------------------------------------------------
-mostrar("\n[BLOQUE 4] DATA WRANGLING CON PANDAS NATIVO");
-
-csv_txt = "edad,salario,compra,categoria\n25,40000.0,0,Premium\n32,54000.0,1,Standard\n47,80000.0,1,Premium\n";
-df = pd_read_csv(csv_txt);
-col_sal = pd_get_column(df, "salario");
-df_oh = pd_one_hot_encode(df, "categoria");
-assert("Pandas (pd_read_csv y casteo automatico)", longitud(df["data"]) == 3 && col_sal[0] == 40000.0);
-assert("Pandas (pd_one_hot_encode en variables categoricas)", df_oh["columnas"].contains("categoria_Premium") && df_oh["data"][0][3] == 1);
-
-// -----------------------------------------------------------------
-// RESUMEN FINAL
-// -----------------------------------------------------------------
-mostrar("\n=================================================================");
-mostrar("                     DASHBOARD SUMMARY                           ");
-mostrar("=================================================================");
-mostrar("  Pruebas Ejecutadas: " + a_texto(runner_stats[1]));
-mostrar("  Pruebas Exitosas:   " + a_texto(runner_stats[0]));
-mostrar("  Pruebas Fallidas:   " + a_texto(runner_stats[1] - runner_stats[0]));
-mostrar("=================================================================");
-si (runner_stats[0] == runner_stats[1]) {
-    mostrar("   ¡FELICITACIONES! PELE HA SUPERADO EL 100% DE LAS PRUEBAS    ");
-} sino {
-    mostrar("   ATENCION: ALGUNAS PRUEBAS HAN FALLADO                       ");
-}
 mostrar("=================================================================");

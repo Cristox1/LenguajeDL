@@ -24,8 +24,12 @@ df_y = pd_select_columns(df_oh_target, ["Drug_DrugY", "Drug_drugC", "Drug_drugX"
 X_raw = pd_to_numpy(df_X);
 y_raw = pd_to_numpy(df_y);
 
-// Normalizar variables continuas de entrada (Age, Na_to_K y los one-hots) mediante Min-Max
-norm_res = normalizar(X_raw);
+// Tomar un subconjunto de entrenamiento representativo (primeras 35 filas)
+X_raw_train = X_raw.slice(0, 35);
+y_raw_train = y_raw.slice(0, 35);
+
+// Normalizar variables continuas de entrada mediante Min-Max
+norm_res = normalizar(X_raw_train);
 X_norm = arr_get(norm_res, 0);
 mins = arr_get(norm_res, 1);
 maxs = arr_get(norm_res, 2);
@@ -38,15 +42,19 @@ mostrar("  -> Arquitectura: [9 entradas, 16 ocultas (ReLU), 5 salidas (MSE)]");
 random_seed(42);
 modelo_mlp = nn_mlp_init([9, 16, 5]);
 
-epocas = 100;
-lr = 0.05;
+epocas = 120;
+lr = 35.0; // lr compensado para el divisor (batch * n_out) de la libreria
 mostrar("  -> Comenzando entrenamiento (" + a_texto(epocas) + " epocas, lr = " + a_texto(lr) + ")...");
 
-historia = nn_mlp_train(modelo_mlp, X_norm, y_raw, lr, epocas);
+historia = nn_mlp_train(modelo_mlp, X_norm, y_raw_train, lr, epocas);
 
 mostrar("  -> Loss Inicial (Epoca 1):   " + a_texto(arr_get(historia, 0)));
-mostrar("  -> Loss Intermedio (Epoca 100): " + a_texto(arr_get(historia, 99)));
-mostrar("  -> Loss Intermedio (Epoca 200): " + a_texto(arr_get(historia, 199)));
+si (epocas >= 50) {
+    mostrar("  -> Loss Intermedio (Epoca 50): " + a_texto(arr_get(historia, 49)));
+}
+si (epocas >= 100) {
+    mostrar("  -> Loss Intermedio (Epoca 100): " + a_texto(arr_get(historia, 99)));
+}
 mostrar("  -> Loss Final (Epoca " + a_texto(epocas) + "):     " + a_texto(arr_get(historia, epocas - 1)));
 
 
@@ -70,7 +78,7 @@ por (i = 0; i < total_preds; i = i + 1) {
         }
     }
     // Obtener argmax real de target
-    real_i = arr_get(y_raw, i);
+    real_i = arr_get(y_raw_train, i);
     real_idx = 0;
     por (j = 0; j < 5; j = j + 1) {
         si (arr_get(real_i, j) == 1) {

@@ -1,4 +1,3 @@
-
 mostrar(" Clasificador de medicamentos");
 
 // 1. Cargar el dataset CSV
@@ -25,8 +24,8 @@ X_raw = pd_to_numpy(df_X);
 y_raw = pd_to_numpy(df_y);
 
 // Tomar un subconjunto de entrenamiento representativo (primeras 35 filas)
-X_raw_train = X_raw.slice(0, 35);
-y_raw_train = y_raw.slice(0, 35);
+X_raw_train = X_raw.slice(0, 70);
+y_raw_train = y_raw.slice(0, 70);
 
 // Normalizar variables continuas de entrada mediante Min-Max
 norm_res = normalizar(X_raw_train);
@@ -40,10 +39,10 @@ maxs = arr_get(norm_res, 2);
 mostrar(" Inicializando Perceptron Multicapa");
 mostrar("  -> Arquitectura: [9 entradas, 16 ocultas (ReLU), 5 salidas (MSE)]");
 random_seed(42);
-modelo_mlp = nn_mlp_init([9, 16, 5]);
+modelo_mlp = nn_mlp_init([9, 15, 5]);
 
-epocas = 120;
-lr = 35.0; // lr compensado para el divisor (batch * n_out) de la libreria
+epocas =80;
+lr = 1.0; // lr compensado para el divisor (batch * n_out) de la libreria
 mostrar("  -> Comenzando entrenamiento (" + a_texto(epocas) + " epocas, lr = " + a_texto(lr) + ")...");
 
 historia = nn_mlp_train(modelo_mlp, X_norm, y_raw_train, lr, epocas);
@@ -106,17 +105,17 @@ mostrar(" Demostrando capacidad predictora con nuevos pacientes");
 funcion crear_vector_paciente(age, sex, bp, cholesterol, na_to_k) {
     v = crear_pila();
     pila_push(v, age);
-    
+
     si (sex == "F") { pila_push(v, 1.0); pila_push(v, 0.0); }
     sino { pila_push(v, 0.0); pila_push(v, 1.0); }
-    
+
     si (bp == "HIGH") { pila_push(v, 1.0); pila_push(v, 0.0); pila_push(v, 0.0); }
     sino si (bp == "LOW") { pila_push(v, 0.0); pila_push(v, 1.0); pila_push(v, 0.0); }
     sino { pila_push(v, 0.0); pila_push(v, 0.0); pila_push(v, 1.0); }
-    
+
     si (cholesterol == "HIGH") { pila_push(v, 1.0); pila_push(v, 0.0); }
     sino { pila_push(v, 0.0); pila_push(v, 1.0); }
-    
+
     pila_push(v, na_to_k);
     retornar v;
 }
@@ -134,11 +133,11 @@ funcion normalizar_punto(x, mins, maxs) {
 funcion predecir_droga_paciente(modelo, age, sex, bp, cholesterol, na_to_k, mins, maxs) {
     v = crear_vector_paciente(age, sex, bp, cholesterol, na_to_k);
     v_norm = normalizar_punto(v, mins, maxs);
-    
+
     // Realizar paso forward
     res_lote = nn_mlp_predict(modelo, [v_norm]);
     pred_vec = arr_get(res_lote, 0);
-    
+
     // Obtener la clase predicha con mayor probabilidad (argmax)
     max_val = arr_get(pred_vec, 0);
     max_idx = 0;
@@ -148,7 +147,7 @@ funcion predecir_droga_paciente(modelo, age, sex, bp, cholesterol, na_to_k, mins
             max_idx = j;
         }
     }
-    
+
     drogas = ["DrugY", "drugC", "drugX", "drugA", "drugB"];
     retornar arr_get(drogas, max_idx);
 }
